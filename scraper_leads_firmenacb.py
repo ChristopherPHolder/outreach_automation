@@ -5,15 +5,20 @@ from webdriver_manager.chrome import ChromeDriverManager
 from tqdm import tqdm  # contador/barra de progreso
 import pandas as pd  # libreria para guardar los datos e exportarlo en formato tabla
 
+import time
+
 # companyName = "steuerberater"  # "steuerberater"
 companyName = input("Enter the company name: ")
 # location = "kärnten"  # "kärnten"
 location = input("Enter the location: ")  # "kärnten"
-limit = 100  # porcentaje de extraccion total - 100%
-# limit = int(input("Enter the percentage (number 0-100) of results to export: "))
+# limit = 100  # porcentaje de extraccion total - 100%
+limit = int(input("Enter the percentage (number 0-100) of results to export: "))
 
 driver = webdriver.Chrome(ChromeDriverManager().install())
 driver.get("https://www.firmenabc.at/")
+
+# should be replaced with something better
+time.sleep(1)
 
 cookiesHandle = driver.find_element_by_xpath(
     '//*[@id="CybotCookiebotDialogBodyLevelButtonLevelOptinAllowAll"]'
