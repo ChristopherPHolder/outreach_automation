@@ -5,9 +5,11 @@ import numpy as np
 
 # Importing keywords
 wordlist = pd.read_excel("wordlist.xlsx")
+print("Succesfully imported wordlist from: " + "wordlist.xlsx")
 
 # Importing data with urls
 df = pd.read_excel("steuerberater_kärnten.xlsx")
+print("Succesfully imported leads from: " + "steuerberater_kärnten.xlsx")
 
 # Filtering companies with web
 df_web = df[pd.notnull(df["Web"])].reset_index(drop=True)
@@ -26,7 +28,7 @@ for url in list_of_urls:
     # Extract all links of the page
     try:
         url = "https://" + url
-        print("result for: ", url)
+        print("Result for: ", url)
         req = requests.get(url, timeout=5)
         print(req.status_code)
         if req.status_code != 200:
@@ -34,7 +36,7 @@ for url in list_of_urls:
         soup = BeautifulSoup(req.text, "lxml")
         all_a_s = soup.find_all("a")
     except Exception as e:
-        print("Error obtaining page. Exception ", e)
+        print("Error obtaining page. Exception error:\n", e)
     try:
         list_of_urls_by_page = []
         for item in all_a_s:
@@ -78,7 +80,7 @@ for list_items in totally:
             rr = requests.get(element)
             ss = BeautifulSoup(rr.text, "lxml")
             if ss:
-                print("successful request")
+                print(index + "successful request")
         except Exception as e:
             try:
                 new_url = "https://" + df_web.loc[index, "Web"] + element
