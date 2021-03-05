@@ -23,7 +23,7 @@ totally = []
 totally_content = []
 for url in list_of_urls:
     print("<--------------------------------------------------> ", counter + 1)
-    # extract all links of the page
+    # Extract all links of the page
     try:
         url = "https://" + url
         print("result for: ", url)
