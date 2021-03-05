@@ -1,7 +1,7 @@
-# outreach_automation
-Automating the outreach marketing of PureMind Digital Gmbh
+# PureMind_automation
+Automating the processes in PureMind Digital Gmbh
 
-Eventually this Repo will automate all possible aspects of the Outreach Marketing process conducted by PureMind Digital
+Eventually this Repo will automate all possible aspects and processes conducted by PureMind Digital
 
 To run the firmenabc.at Scraper start by installing the requirements
 
