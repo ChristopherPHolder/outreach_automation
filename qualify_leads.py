@@ -1,15 +1,54 @@
-import pandas as pd
-from bs4 import BeautifulSoup
 import requests
-import numpy as np
+from bs4 import BeautifulSoup
+import urllib.parse
+from urllib.parse import urlparse
+import re
+import pandas as pd
+from tqdm import tqdm
 
-# Importing keywords
-wordlist = pd.read_excel("wordlist.xlsx")
-print("Succesfully imported wordlist from: " + "wordlist.xlsx")
+# Importing wordlist
+def get_wordlist_ql():
+    wordlistfile = input("Insert wordlist: ")
+    if wordlistfile == "":
+        print("The default wordlist used")
+        wordlistfile = "wordlist.xlsx"
+    try: 
+        wordlist = pd.read_excel(wordlistfile)
+        print("Succesfully imported wordlist from: " + wordlistfile)
+        return wordlist
 
-# Importing data with urls
-df = pd.read_excel("steuerberater_kärnten.xlsx")
-print("Succesfully imported leads from: " + "steuerberater_kärnten.xlsx")
+    except FileNotFoundError:
+        print("\nError: Wordlist file not found!")
+        print("Check if you did any typos and that the file is in the correct folder.\
+            \nOnce you found the error, try to run the program again.\
+            \nRemeber you can leave the field blank and it will use wordlist.xlsx \n")
+        quit()
+
+# Import leads data
+def get_leadsfile_ql():
+    leadsfile = input("\nInsert leads: ")
+    
+    # Import generic file for testing
+    if leadsfile == "t":
+        print("The the testing leads file was used.")
+        leadsfile = "steuerberater_kärnten_test.xlsx"
+    try:
+        df = pd.read_excel(leadsfile)
+        print("Succesfully imported leads from: " + leadsfile)
+        return df
+
+    except FileNotFoundError:
+        print("\nError: leads file not found!\
+            \n Check if you did any typos and that the file is in the correct folder\
+            \nOnce you found the error, try to run the program again.")
+        quit()
+
+    except AssertionError:
+        print("\nA leads file is necesarry for this program. No file name was provided.\n")
+        quit()
+
+wordlist = get_wordlist_ql()
+df = get_leadsfile_ql()
 
 # Filtering companies with web
 df_web = df[pd.notnull(df["Web"])].reset_index(drop=True)
