@@ -11,7 +11,8 @@ from comp.get_user_input import get_company_type, get_company_location, get_sear
 def scrape_firmenabc():
     # Request input from user for company type, location and search limit
     companytype = get_company_type()
-    location = get_company_location()
+    #location = get_company_location()
+    location = input("Enter the location (Bezirk/Ort/Plz): ")
     limit = get_search_limit()
 
     driver = webdriver.Chrome(ChromeDriverManager().install())
