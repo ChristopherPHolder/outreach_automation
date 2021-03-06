@@ -5,11 +5,12 @@ from urllib.parse import urlparse
 import re
 import pandas as pd
 from tqdm import tqdm
+
 from comp.get_user_input import get_leadsfile_ql
 
 def add_url(filename):
     # Importing data with urls
-    df = pd.read_excel(filename + ".xlsx")
+    df = pd.read_excel("leads/" + filename + ".xlsx")
     # Filtering companies with web
     df_no_web = df[pd.isnull(df["Web"])].reset_index(drop=True)
 

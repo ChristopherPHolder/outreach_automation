@@ -27,10 +27,10 @@ def get_leadsfile_ql():
     # Import generic file for testing
     if leadsfile == "t":
         print("The the testing leads file was used.")
-        leadsfile = "steuerberater_kärnten_test.xlsx"
+        leadsfile = "steuerberater_kärnten_test"
     try:
-        df = pd.read_excel("leads/" + leadsfile)
-        print("Succesfully imported leads from: " + leadsfile)
+        df = pd.read_excel("leads/" + leadsfile + ".xlsx")
+        print("Succesfully imported leads from: " + leadsfile + ".xlsx")
         return leadsfile
 
     except FileNotFoundError:

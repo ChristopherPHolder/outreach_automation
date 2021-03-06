@@ -5,13 +5,14 @@ from urllib.parse import urlparse
 import re
 import pandas as pd
 from tqdm import tqdm
+import numpy as np
 
 from comp.get_user_input import get_wordlist_ql, get_leadsfile_ql
 
 def qualify_leads_fn(filename, wordlist):
 
     # Open leadsfile
-    df = pd.read_excel("leads/" + filename)
+    df = pd.read_excel("leads/" + filename + ".xlsx")
 
     # Filtering companies with web
     df_web = df[pd.notnull(df["Web"])].reset_index(drop=True)
