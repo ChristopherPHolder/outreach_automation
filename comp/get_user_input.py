@@ -2,7 +2,6 @@ import pandas as pd
 
 # Important! this return file names they do not include paths! 
 # Paths must be added afterwords depending on use
-
 # Importing wordlist
 def get_wordlist_ql():
     wordlistfile = input("Insert wordlist: ")
@@ -47,3 +46,30 @@ def get_leadsfile_ql():
     except IsADirectoryError:
         print("\nA leads file is necesarry for this program. No file name was provided.\n")
         quit()
+
+def get_company_type():
+    companytype = input("Enter the company type: ")
+    if companytype == "":
+        print("Company type was left empty")
+        return companytype
+
+    elif companytype == "s":
+        companytype = "Steuerberater"
+        print("Default Company type was selected. 'Steuerberater'")
+        return companytype
+
+def get_company_location():
+    location = input("Enter the location (Bezirk/Ort/Plz): ")
+    if location == "":
+        print("Company location was left empty")
+        return location
+
+def get_search_limit():
+    limit = int(input("Enter the percentage (number 0-100) of results to export: "))
+    if limit == "":
+        print("Default 100 percent search extraction was set")
+        limit = 100
+        return limit
+    
+    elif  0 < limit > 100:
+        return limit
