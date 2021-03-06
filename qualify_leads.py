@@ -13,7 +13,7 @@ def get_wordlist_ql():
         print("The default wordlist used")
         wordlistfile = "wordlist.xlsx"
     try: 
-        wordlist = pd.read_excel(wordlistfile)
+        wordlist = pd.read_excel("wordlist/" + wordlistfile)
         print("Succesfully imported wordlist from: " + wordlistfile)
         return wordlist
 
@@ -33,9 +33,9 @@ def get_leadsfile_ql():
         print("The the testing leads file was used.")
         leadsfile = "steuerberater_kärnten_test.xlsx"
     try:
-        df = pd.read_excel(leadsfile)
+        df = pd.read_excel("leads/" + leadsfile)
         print("Succesfully imported leads from: " + leadsfile)
-        return df
+        return leadsfile
 
     except FileNotFoundError:
         print("\nError: leads file not found!\
@@ -48,7 +48,10 @@ def get_leadsfile_ql():
         quit()
 
 wordlist = get_wordlist_ql()
-df = get_leadsfile_ql()
+leadsfile = get_leadsfile_ql()
+
+# Open leadsfile
+df = pd.read_excel("leads/" + leadsfile)
 
 # Filtering companies with web
 df_web = df[pd.notnull(df["Web"])].reset_index(drop=True)
@@ -169,4 +172,4 @@ def priorities(list_of_items):
 
 
 df_web.loc[:, "qualify"] = priorities(ordered)
-df_web.to_excel("qualifier_file.xlsx")
+df_web.to_excel("leads/" + "qualified_" + leadsfile)
