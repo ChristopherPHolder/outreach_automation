@@ -2,29 +2,29 @@ from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 
-from tqdm import tqdm  # contador/barra de progreso
-import pandas as pd  # libreria para guardar los datos e exportarlo en formato tabla
+from tqdm import tqdm  # Progress bar / counter
+import pandas as pd  # Library to store and export data formated as a table
+import time  # Library to allow waiting and sleep
 
-import time
-
-# companyName = "steuerberater"  # "steuerberater"
-companyName = input("Enter the company name: ")
-# location = "kärnten"  # "kärnten"
-location = input("Enter the location: ")  # "kärnten"
+# Request input from user for company type and location
+companyName = input("Enter the company type: ")
+location = input("Enter the location (Bezirk/Ort/Plz): ")
 # limit = 100  # porcentaje de extraccion total - 100%
 limit = int(input("Enter the percentage (number 0-100) of results to export: "))
 
 driver = webdriver.Chrome(ChromeDriverManager().install())
 driver.get("https://www.firmenabc.at/")
 
-# should be replaced with something better
-time.sleep(1)
+# Wait for cookie popup to load
+time.sleep(5)
 
+# Accept cookie popup
 cookiesHandle = driver.find_element_by_xpath(
     '//*[@id="CybotCookiebotDialogBodyLevelButtonLevelOptinAllowAll"]'
 )
 cookiesHandle.click()
 
+# Input user input into search
 searchInput1 = driver.find_element_by_xpath('//*[@id="what"]')
 searchInput1.send_keys(companyName)
 
