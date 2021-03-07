@@ -39,10 +39,13 @@ def qualify_leads_fn(filename, wordlist):
         try:
             try:
                 url = "https://" + url
+                req = requests.get(url)
+                print('was with https')
             except:
                 url = "http://" + url
+                req = requests.get(url)
+                print('was with http')
             print("Result for: ", url)
-            req = requests.get(url, timeout=5)
             print(req.status_code)
             if req.status_code != 200:
                 print("Error obteniendo la página. Status Code", r.status_code)
@@ -87,6 +90,8 @@ def qualify_leads_fn(filename, wordlist):
     index = 0
     ordered = []
     for list_items in totally:
+        print("<--------------------------------------------------> ", index + 1)
+        print(df_web.loc[index, "Firmenname"])
         classifications_of_all_links_in_page = []
         for element in list_items:
             try:
@@ -98,9 +103,10 @@ def qualify_leads_fn(filename, wordlist):
                 try:
                     try:
                         new_url = "https://" + df_web.loc[index, "Web"] + element
+                        rr = requests.get(new_url)
                     except:
                         new_url = "http://" + df_web.loc[index, "Web"] + element
-                    rr = requests.get(new_url)
+                        rr = requests.get(new_url)
                     ss = BeautifulSoup(rr.text, "lxml")
                 except:
                     ss = ""
@@ -114,6 +120,7 @@ def qualify_leads_fn(filename, wordlist):
                 ]
                 if len(words_founded) >= 1:
                     classification.append(tp)
+            print(classification)
             classifications_of_all_links_in_page.append(classification)
         ordered.append(classifications_of_all_links_in_page)
         index += 1
@@ -125,37 +132,31 @@ def qualify_leads_fn(filename, wordlist):
             total_links = []
             for item in items:
                 total_links.append(len(item))
-                if (("No" in item) and ("Fuck Yes" in item) and ("Yes" in item)) or (("No" in item) and ("Fuck Yes" in item)) or (("No" in item) and ("Yes" in item)):
-                    status = "No"
-                elif (
-                    ("No" in item)
-                    and ("Fuck Yes" in item)
-                    and ("Yes" in item)
-                    and ("Maybe" in item)
-                ):
-                    status = "Maybe"
-                elif ("No" in item) and ("Maybe" in item):
-                    status = 'Maybe'
-                else:
-                    for tt in item:
-                        status = tt
+                # prioridad del No sobre 
+                if (("NoHire" in item) and ("HireNow" in item) and ("YesHire" in item)) or (("NoHire" in item) and ("HireNow" in item)) or (("NoHire" in item) and ("YesHire" in item)):
+                    status = "NoHire"
+                elif ("MaybeHire" in item):
+                    status = "MaybeHire"
+                # elif ("NoHire" in item) and ("MaybeHire" in item):
+                #     status = 'MaybeHire'
+                elif len(item)==1:
+                    status = item[0]
             if sum(total_links) == 0:
-                status = "Fuck No"
+                status = "NoCarrierF"
             qualifying.append(status)
         return qualifying
 
     def set_value(row_number, assigned_value): 
-        return assigned_value[row_number] 
+        return assigned_value[row_number]
 
-    assigning = { "Fuck No": 1,"No": 3, "Maybe": 4, "Yes": 5, "Fuck Yes": 6 }
+    assigning = { "NoWeb":0, "NoCarrierF":1, "NoHire":2, "NotNow":3, "MaybeHire":4, "YesHire":5, "HireNow":6 }
     
     qualifier = pd.Series(priorities(ordered)).apply(set_value, args =(assigning, ))
     df_web.insert(loc = 0, column = 'Qualifier', value = qualifier)
     df_no_web.insert(loc = 0, column = 'Qualifier', value = 0)
 
-    df_no_web.insert(loc = 1, column = 'Tag', value = 'no web')
-    assigning_tag = { 0: "NoWeb", 1: "NoCarrierF", 2: "NoHire", 3: "NotNow", 4: "MaybeHire", 5: "YesHire", 6: "HireNow" }
-    tags = df_web['Qualifier'].apply(set_value, args =(assigning_tag, ))
+    df_no_web.insert(loc = 1, column = 'Tag', value = 'NoWeb')
+    tags = pd.Series(priorities(ordered))
     df_web.insert(loc = 1, column = 'Tag', value = tags)
 
     df_t = df_web.append(df_no_web, ignore_index=True, sort=False)
