@@ -35,7 +35,10 @@ def add_url(filename):
                 for i in a:
                     k = i.get("href")
                     try:
-                        m = re.search("(?P<url>https?://[^\s]+)", k)
+                        try:
+                            m = re.search("(?P<url>https?://[^\s]+)", k)
+                        except:
+                            m = re.search("(?P<url>http?://[^\s]+)", k)
                         n = m.group(0)
                         rul = n.split("&")[0]
                         domain = urlparse(rul)

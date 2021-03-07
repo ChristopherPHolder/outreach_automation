@@ -37,7 +37,10 @@ def qualify_leads_fn(filename, wordlist):
         print("<--------------------------------------------------> ", counter + 1)
         # Extract all links of the page
         try:
-            url = "https://" + url
+            try:
+                url = "https://" + url
+            except:
+                url = "http://" + url
             print("Result for: ", url)
             req = requests.get(url, timeout=5)
             print(req.status_code)
@@ -93,7 +96,10 @@ def qualify_leads_fn(filename, wordlist):
                     print(index + "successful request")
             except Exception as e:
                 try:
-                    new_url = "https://" + df_web.loc[index, "Web"] + element
+                    try:
+                        new_url = "https://" + df_web.loc[index, "Web"] + element
+                    except:
+                        new_url = "http://" + df_web.loc[index, "Web"] + element
                     rr = requests.get(new_url)
                     ss = BeautifulSoup(rr.text, "lxml")
                 except:
@@ -141,7 +147,7 @@ def qualify_leads_fn(filename, wordlist):
     def set_value(row_number, assigned_value): 
         return assigned_value[row_number] 
 
-    assigning = { "Fuck No": 2,"No": 3, "Maybe": 4, "Yes": 5, "Fuck Yes": 6 }
+    assigning = { "Fuck No": 1,"No": 3, "Maybe": 4, "Yes": 5, "Fuck Yes": 6 }
     
     qualifier = pd.Series(priorities(ordered)).apply(set_value, args =(assigning, ))
     df_web.insert(loc = 0, column = 'Qualifier', value = qualifier)
