@@ -14,8 +14,15 @@ def qualify_leads_fn(filename, wordlist):
     # Open leadsfile
     df = pd.read_excel("leads/" + filename + ".xlsx")
 
+    # Drop extra column
+    try:
+        df.drop('Unnamed: 0', axis=1, inplace=True)
+    except:
+        pass
+
     # Filtering companies with web
     df_web = df[pd.notnull(df["Web"])].reset_index(drop=True)
+    df_no_web = df[pd.isnull(df["Web"])].reset_index(drop=True)
 
     # Extract subdomains to make the first filter
     subdomains = wordlist[wordlist["State"] == "Subdomains"].Word.tolist()
@@ -68,7 +75,7 @@ def qualify_leads_fn(filename, wordlist):
     list_total = []
 
     # Initializing new column
-    df_web.loc[:, "qualify"] = np.nan
+    # df_web.loc[:, "qualify"] = np.nan
 
     # Extract labels for classification
     types = wordlist.State.unique().tolist()
@@ -131,9 +138,24 @@ def qualify_leads_fn(filename, wordlist):
             qualifying.append(status)
         return qualifying
 
-    df_web.loc[:, "qualify"] = priorities(ordered)
+    def set_value(row_number, assigned_value): 
+        return assigned_value[row_number] 
+
+    assigning = { "Fuck No": 2,"No": 3, "Maybe": 4, "Yes": 5, "Fuck Yes": 6 }
+    
+    qualifier = pd.Series(priorities(ordered)).apply(set_value, args =(assigning, ))
+    df_web.insert(loc = 0, column = 'Qualifier', value = qualifier)
+    df_no_web.insert(loc = 0, column = 'Qualifier', value = 0)
+
+    df_no_web.insert(loc = 1, column = 'Tag', value = 'no web')
+    assigning_tag = { 0: "NoWeb", 1: "NoCarrierF", 2: "NoHire", 3: "NotNow", 4: "MaybeHire", 5: "YesHire", 6: "HireNow" }
+    tags = df_web['Qualifier'].apply(set_value, args =(assigning_tag, ))
+    df_web.insert(loc = 1, column = 'Tag', value = tags)
+
+    df_t = df_web.append(df_no_web, ignore_index=True, sort=False)
+
     filename = filename + "_qualified"
-    df_web.to_excel("leads/" + filename + ".xlsx")
+    df_t.to_excel("leads/" + filename + ".xlsx")
 
     return filename
 
