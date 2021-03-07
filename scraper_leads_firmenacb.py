@@ -6,14 +6,17 @@ from tqdm import tqdm  # Progress bar / counter
 import pandas as pd  # Library to store and export data formated as a table
 import time  # Library to allow waiting and sleep
 
-from comp.get_user_input import get_company_type, get_company_location, get_search_limit
+#from comp.get_user_input import get_company_type, get_company_location, get_search_limit
 
 def scrape_firmenabc():
     # Request input from user for company type, location and search limit
-    companytype = get_company_type()
+    #companytype = get_company_type()
+    companytype = input("Enter the company type: ")
     #location = get_company_location()
     location = input("Enter the location (Bezirk/Ort/Plz): ")
-    limit = get_search_limit()
+    #limit = get_search_limit()
+    limit = int(input("Enter the percentage (number 0-100) of results to export: "))
+
 
     driver = webdriver.Chrome(ChromeDriverManager().install())
     driver.get("https://www.firmenabc.at/")
