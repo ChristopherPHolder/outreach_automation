@@ -153,7 +153,7 @@ def qualify_leads_fn(filename, wordlist):
     df_web.insert(loc = 0, column = 'Qualifier', value = qualifier)
     df_no_web.insert(loc = 0, column = 'Qualifier', value = 0)
 
-    df_no_web.insert(loc = 1, column = 'Tag', value = 'no web')
+    df_no_web.insert(loc = 1, column = 'Tag', value = 'NoWeb')
     assigning_tag = { 0: "NoWeb", 1: "NoCarrierF", 2: "NoHire", 3: "NotNow", 4: "MaybeHire", 5: "YesHire", 6: "HireNow" }
     tags = df_web['Qualifier'].apply(set_value, args =(assigning_tag, ))
     df_web.insert(loc = 1, column = 'Tag', value = tags)
