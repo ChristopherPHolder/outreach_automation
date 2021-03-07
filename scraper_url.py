@@ -13,7 +13,10 @@ def add_url(filename):
     # Importing data with urls
     df = pd.read_excel("leads/" + filename + ".xlsx")
     # Filtering companies with web
-    df.drop("Unnamed: 0", axis=1, inplace=True)
+    try:
+        df.drop("Unnamed: 0", axis=1, inplace=True)
+    except:
+        pass
 
     df_no_web = df[pd.isnull(df["Web"])].reset_index(drop=True)
     df_web = df[pd.notnull(df["Web"])].reset_index(drop=True)
