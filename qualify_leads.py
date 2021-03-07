@@ -156,7 +156,12 @@ def qualify_leads_fn(filename, wordlist):
     df_no_web.insert(loc = 0, column = 'Qualifier', value = 0)
 
     df_no_web.insert(loc = 1, column = 'Tag', value = 'NoWeb')
+<<<<<<< HEAD
     tags = pd.Series(priorities(ordered))
+=======
+    assigning_tag = { 0: "NoWeb", 1: "NoCarrierF", 2: "NoHire", 3: "NotNow", 4: "MaybeHire", 5: "YesHire", 6: "HireNow" }
+    tags = df_web['Qualifier'].apply(set_value, args =(assigning_tag, ))
+>>>>>>> 5fc0d01e02d1621bdd2bb653e234c53e2bd9b5ec
     df_web.insert(loc = 1, column = 'Tag', value = tags)
 
     df_t = df_web.append(df_no_web, ignore_index=True, sort=False)
