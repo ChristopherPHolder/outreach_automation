@@ -23,6 +23,7 @@ def scrape_firmenabc():
     #location = get_company_location()
     location = input("Enter the location (Bezirk/Ort/Plz): ")
     if location == "t":
+        location = burgenland
     #limit = get_search_limit()
     limit = int(input("Enter the percentage (number 0-100) of results to export: "))
 
