@@ -38,18 +38,22 @@ def qualify_leads_fn(filename, wordlist):
         # Extract all links of the page
         try:
             try:
+                print("Result for: ", url)
                 url = "https://" + url
                 req = requests.get(url)
                 print('was with https')
             except:
                 url = "http://" + url
                 req = requests.get(url)
+                print("Result for: ", url)
                 print('was with http')
-            print("Result for: ", url)
             print(req.status_code)
             if req.status_code != 200:
                 print("Error obteniendo la página. Status Code", r.status_code)
-            soup = BeautifulSoup(req.text, "lxml")
+            try:
+                soup = BeautifulSoup(req.text, "lxml")
+            except:
+                soup = BeautifulSoup(req.text, "html.parser")
             all_a_s = soup.find_all("a")
         except Exception as e:
             print("Error obtaining page. Exception error:\n", e)
