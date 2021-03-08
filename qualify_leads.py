@@ -120,28 +120,27 @@ def qualify_leads_fn(filename, wordlist):
                 ]
                 if len(words_founded) >= 1:
                     classification.append(tp)
-            print(classification)
             classifications_of_all_links_in_page.append(classification)
-        ordered.append(classifications_of_all_links_in_page)
+        adding = [item for elem in classifications_of_all_links_in_page for item in elem]
+        print(adding)
+        ordered.append(adding)
         index += 1
 
 
     def priorities(list_of_items):
         qualifying = []
         for items in list_of_items:
-            total_links = []
-            for item in items:
-                total_links.append(len(item))
-                # prioridad del No sobre 
-                if (("NoHire" in item) and ("HireNow" in item) and ("YesHire" in item)) or (("NoHire" in item) and ("HireNow" in item)) or (("NoHire" in item) and ("YesHire" in item)):
-                    status = "NoHire"
-                elif ("MaybeHire" in item):
-                    status = "MaybeHire"
-                # elif ("NoHire" in item) and ("MaybeHire" in item):
-                #     status = 'MaybeHire'
-                elif len(item)==1:
-                    status = item[0]
-            if sum(total_links) == 0:
+            # total_links.append(len(item))
+            # prioridad del No sobre 
+            if (("NoHire" in items) and ("HireNow" in items) and ("YesHire" in items)) or (("NoHire" in items) and ("HireNow" in items)) or (("NoHire" in items) and ("YesHire" in items)):
+                status = "NoHire"
+            elif ("MaybeHire" in items):
+                status = "MaybeHire"
+            # elif ("NoHire" in item) and ("MaybeHire" in item):
+            #     status = 'MaybeHire'
+            elif len(items)>=1:
+                status = items[0]
+            if len(items) == 0:
                 status = "NoCarrierF"
             qualifying.append(status)
         return qualifying
@@ -150,19 +149,18 @@ def qualify_leads_fn(filename, wordlist):
         return assigned_value[row_number]
 
     assigning = { "NoWeb":0, "NoCarrierF":1, "NoHire":2, "NotNow":3, "MaybeHire":4, "YesHire":5, "HireNow":6 }
+
+    classification_priorities = priorities(ordered)
     
-    qualifier = pd.Series(priorities(ordered)).apply(set_value, args =(assigning, ))
+    qualifier = pd.Series(classification_priorities).apply(set_value, args =(assigning, ))
+
+    df_no_web.insert(loc = 0, column = 'Tag', value = 'NoWeb')
+    df_web.insert(loc = 0, column = 'Tag', value = classification_priorities)
+
     df_web.insert(loc = 0, column = 'Qualifier', value = qualifier)
     df_no_web.insert(loc = 0, column = 'Qualifier', value = 0)
 
-    df_no_web.insert(loc = 1, column = 'Tag', value = 'NoWeb')
-<<<<<<< HEAD
-    tags = pd.Series(priorities(ordered))
-=======
-    assigning_tag = { 0: "NoWeb", 1: "NoCarrierF", 2: "NoHire", 3: "NotNow", 4: "MaybeHire", 5: "YesHire", 6: "HireNow" }
-    tags = df_web['Qualifier'].apply(set_value, args =(assigning_tag, ))
->>>>>>> 5fc0d01e02d1621bdd2bb653e234c53e2bd9b5ec
-    df_web.insert(loc = 1, column = 'Tag', value = tags)
+    # tags = df_web['Qualifier'].apply(set_value, args =(assigning_tag, ))
 
     df_t = df_web.append(df_no_web, ignore_index=True, sort=False)
 
