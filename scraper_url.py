@@ -85,6 +85,13 @@ def add_url(filename):
     # df_concat = pd.concat([df_web, df_no_web], axis=0)
     # print('df_concat: ', df_concat)
 
+    n = df_t.shape[0]
+    for i in range(n):
+        if df_t.loc[i, "URL"] != "":
+            df_t.loc[i, "Web"] = df_t.loc[i, "URL"]
+
+    df_t.drop("URL", axis=1, inplace=True)
+
     filename = filename + "_plus"
     df_t.to_excel("leads/" + filename + ".xlsx")
 
