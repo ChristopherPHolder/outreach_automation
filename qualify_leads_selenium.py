@@ -44,6 +44,7 @@ def qualify_leads_fn(filename, wordlist):
     list_of_urls = df_web.Web.tolist()
     totally = []
     totally_content = []
+    urls_with_subdomain = []
     for url in list_of_urls:
         print("<--------------------------------------------------> ", counter + 1)
         # Extract all links of the page
@@ -77,6 +78,7 @@ def qualify_leads_fn(filename, wordlist):
             total_sublist = []
         # print(total_sublist)
         totally.append(total_sublist)
+        urls_with_subdomain.append(list(set(total_sublist)))
         counter += 1
 
         if counter == total_rows:
@@ -132,6 +134,7 @@ def qualify_leads_fn(filename, wordlist):
         ordered.append(adding)
         index += 1
 
+    driver.close()
 
     def priorities(list_of_items):
         qualifying = []
@@ -140,8 +143,10 @@ def qualify_leads_fn(filename, wordlist):
             # prioridad del No sobre 
             if (("NoHire" in items) and ("HireNow" in items) and ("YesHire" in items)) or (("NoHire" in items) and ("HireNow" in items)) or (("NoHire" in items) and ("YesHire" in items)):
                 status = "NoHire"
-            elif ("MaybeHire" in items) and ("HireNow" in items) and ("YesHire" in items):
+            elif ("MaybeHire" in items) and ("HireNow" in items) and ("YesHire" in items) and len(list(set(items)))==3:
                 status = "HireNow"
+            elif ("YesHire" in items) and ("MaybeHire" in items) and len(list(set(items)))==2:
+                status = 'YesHire'
             elif ("YesHire" in items) and ("HireNow" in items) and len(list(set(items)))==2:
                 status = 'HireNow'
             elif len(items)>=1:
@@ -165,6 +170,9 @@ def qualify_leads_fn(filename, wordlist):
 
     df_web.insert(loc = 0, column = 'Qualifier', value = qualifier)
     df_no_web.insert(loc = 0, column = 'Qualifier', value = 0)
+
+    df_web.insert(loc= 2, column='URL', value = urls_with_subdomain)
+    df_no_web.insert(loc= 2, column='URL', value = '')
 
     # tags = df_web['Qualifier'].apply(set_value, args =(assigning_tag, ))
 
