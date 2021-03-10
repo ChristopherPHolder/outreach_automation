@@ -9,6 +9,13 @@ import numpy as np
 
 from comp.get_user_input import get_wordlist_ql, get_leadsfile_ql
 
+
+from selenium.webdriver.chrome.options import Options
+from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
+
+
+
 def qualify_leads_fn(filename, wordlist):
 
     # Open leadsfile
@@ -27,12 +34,17 @@ def qualify_leads_fn(filename, wordlist):
     # Extract subdomains to make the first filter
     subdomains = wordlist[wordlist["State"] == "Subdomains"].Word.tolist()
 
+    options = Options()
+    options.add_argument("--lang=en")
+    driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=options)
+
     # Total of rows in database
     total_rows = df_web.shape[0]
     counter = 0
     list_of_urls = df_web.Web.tolist()
     totally = []
     totally_content = []
+    urls_with_subdomain = []
     for url in list_of_urls:
         print("<--------------------------------------------------> ", counter + 1)
         # Extract all links of the page
@@ -40,34 +52,22 @@ def qualify_leads_fn(filename, wordlist):
             try:
                 print("Result for: ", url)
                 url = "https://" + url
-                req = requests.get(url)
+    #             req = requests.get(url, verify=False)
+                driver.get(url)
                 print('was with https')
             except:
                 url = "http://" + url
-                req = requests.get(url)
+    #             req = requests.get(url, verify=False)
+                driver.get(url)
                 print("Result for: ", url)
                 print('was with http')
-            print(req.status_code)
-            if req.status_code != 200:
-                print("Error obteniendo la página. Status Code", r.status_code)
-            try:
-                soup = BeautifulSoup(req.text, "lxml")
-            except:
-                soup = BeautifulSoup(req.text, "html.parser")
-            all_a_s = soup.find_all("a")
         except Exception as e:
             print("Error obtaining page. Exception error:\n", e)
-        try:
-            list_of_urls_by_page = []
-            for item in all_a_s:
-                if item is not None:
-                    try:
-                        list_of_urls_by_page.append(item.get("href"))
-                    except:
-                        pass
-        except:
-            pass
+        
         # Filtrate links that contain key words
+        elems = driver.find_elements_by_xpath("//a[@href]")
+        list_of_urls_by_page = [elem.get_attribute("href") for elem in elems]
+        # print(list_of_urls_by_page)
         try:
             total_sublist = []
             for url_single in list_of_urls_by_page:
@@ -76,7 +76,9 @@ def qualify_leads_fn(filename, wordlist):
                     total_sublist.append(url_single)
         except:
             total_sublist = []
+        # print(total_sublist)
         totally.append(total_sublist)
+        urls_with_subdomain.append(list(set(total_sublist)))
         counter += 1
 
         if counter == total_rows:
@@ -99,29 +101,31 @@ def qualify_leads_fn(filename, wordlist):
         classifications_of_all_links_in_page = []
         for element in list_items:
             try:
-                rr = requests.get(element)
-                ss = BeautifulSoup(rr.text, "lxml")
-                if ss:
-                    print(index + "successful request")
+    #             rr = requests.get(element)
+    #             ss = BeautifulSoup(rr.text, "lxml")
+                driver.get(element)
+                ss = driver.page_source
+                text_found = re.search(r'text_to_search', ss)
+    #             self.assertNotEqual(text_found, None)
+                if text_found:
+                    print(index + "successful request .. len: ", len(text_found))
             except Exception as e:
                 try:
                     try:
                         new_url = "https://" + df_web.loc[index, "Web"] + element
-                        rr = requests.get(new_url)
+                        driver.get(new_url)
+                        ss = driver.page_source
                     except:
                         new_url = "http://" + df_web.loc[index, "Web"] + element
-                        rr = requests.get(new_url)
-                    ss = BeautifulSoup(rr.text, "lxml")
+                        driver.get(new_url)
+                        ss = driver.page_source
+                    print(type(ss))
                 except:
                     ss = ""
             classification = []
             for tp in types:
                 list_of_words_to_match = wordlist[wordlist["State"] == tp].Word.tolist()
-                words_founded = [
-                    word
-                    for word in list_of_words_to_match
-                    if word.lower() in str(ss).lower()
-                ]
+                words_founded = [word for word in list_of_words_to_match if word.lower() in ss.lower()]
                 if len(words_founded) >= 1:
                     classification.append(tp)
             classifications_of_all_links_in_page.append(classification)
@@ -130,6 +134,7 @@ def qualify_leads_fn(filename, wordlist):
         ordered.append(adding)
         index += 1
 
+    driver.close()
 
     def priorities(list_of_items):
         qualifying = []
@@ -138,10 +143,12 @@ def qualify_leads_fn(filename, wordlist):
             # prioridad del No sobre 
             if (("NoHire" in items) and ("HireNow" in items) and ("YesHire" in items)) or (("NoHire" in items) and ("HireNow" in items)) or (("NoHire" in items) and ("YesHire" in items)):
                 status = "NoHire"
-            elif ("MaybeHire" in items):
-                status = "MaybeHire"
-            # elif ("NoHire" in item) and ("MaybeHire" in item):
-            #     status = 'MaybeHire'
+            elif ("MaybeHire" in items) and ("HireNow" in items) and ("YesHire" in items) and len(list(set(items)))==3:
+                status = "HireNow"
+            elif ("YesHire" in items) and ("MaybeHire" in items) and len(list(set(items)))==2:
+                status = 'YesHire'
+            elif ("YesHire" in items) and ("HireNow" in items) and len(list(set(items)))==2:
+                status = 'HireNow'
             elif len(items)>=1:
                 status = items[0]
             if len(items) == 0:
@@ -163,6 +170,9 @@ def qualify_leads_fn(filename, wordlist):
 
     df_web.insert(loc = 0, column = 'Qualifier', value = qualifier)
     df_no_web.insert(loc = 0, column = 'Qualifier', value = 0)
+
+    df_web.insert(loc= 2, column='URL', value = urls_with_subdomain)
+    df_no_web.insert(loc= 2, column='URL', value = '')
 
     # tags = df_web['Qualifier'].apply(set_value, args =(assigning_tag, ))
 

@@ -18,7 +18,6 @@ def scrape_firmenabc():
     elif companytype == "s":
         companytype = "Steuerberater"
         print("Default Company type was selected. 'Steuerberater'")
-        return companytype
 
     #location = get_company_location()
     location = input("Enter the location (Bezirk/Ort/Plz): ")
