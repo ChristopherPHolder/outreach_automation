@@ -97,6 +97,5 @@ def add_url(filename):
 
     return filename
 
-
 filename = get_leadsfile_ql()
 add_url(filename)
