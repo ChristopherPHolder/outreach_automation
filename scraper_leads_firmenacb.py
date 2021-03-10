@@ -9,8 +9,8 @@ import time  # Library to allow waiting and sleep
 #from comp.get_user_input import get_company_type, get_company_location, get_search_limit
 
 def scrape_firmenabc():
-    # Request input from user for company type, location and search limit
-    #companytype = get_company_type()
+
+    # Get input from user
     companytype = input("Enter the company type: ")
     if companytype == "":
         print("Company type was left empty")
@@ -19,13 +19,19 @@ def scrape_firmenabc():
         companytype = "Steuerberater"
         print("Default Company type was selected. 'Steuerberater'")
 
-    #location = get_company_location()
     location = input("Enter the location (Bezirk/Ort/Plz): ")
     if location == "t":
         location = "burgenland"
-    #limit = get_search_limit()
-    limit = int(input("Enter the percentage (number 0-100) of results to export: "))
+        print("Test location was user: burgenland")
 
+    elif location == "":
+        print("Location was left empty")
+
+    limit = int(input("Enter the percentage (number 0-100) of results to export: "))
+    if limit == "":
+        limit = 100
+    # Code necesary for the limit 
+    limit_set = 0
 
     driver = webdriver.Chrome(ChromeDriverManager().install())
     driver.get("https://www.firmenabc.at/")
@@ -48,10 +54,6 @@ def scrape_firmenabc():
 
     sendInput = driver.find_element_by_xpath('//*[@id="btnSearch"]')
     sendInput.click()
-
-    nameList = driver.find_elements_by_xpath(
-        '//*[@id="main-container"]/div[1]/div[1]/ul[3]/li/div/a/h2'
-    )
 
     listOfLinks = []
     condition = True
@@ -77,7 +79,6 @@ def scrape_firmenabc():
 
     alldetails = []
 
-    test = 0
 
     print("Extracting data...")
     for i in tqdm(listOfLinks):
@@ -198,7 +199,6 @@ def scrape_firmenabc():
                 if "Handelnde Personen:" in list_of_strings:
                     list_acc = []
                     prove = []
-                    proveAnteil = []
                     for item in list_of_strings[1:]:
                         dictjsn = {}
                         accionistas = item.split("\n")
@@ -219,15 +219,16 @@ def scrape_firmenabc():
         except:
             continue
 
-        test += 1
-
         alldetails.append(temp)
-        if test == int(len(listOfLinks) * limit / 100):
+        
+        limit_set += 1
+        if limit_set == int(len(listOfLinks) * limit / 100):
             break
 
     # Converting to table format
     df = pd.DataFrame(alldetails)
-    print(df)  # visualizacion
+    print(df)  # Visualizacion
+    
     # Exporting table in excel format
     filename = companytype + "_" + location
     df.to_excel("leads/" + filename + ".xlsx")

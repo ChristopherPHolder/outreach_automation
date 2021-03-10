@@ -84,7 +84,7 @@ def qualify_leads_fn(filename, wordlist):
         if counter == total_rows:
             break
 
-    list_total = []
+    # list_total = []
 
     # Initializing new column
     # df_web.loc[:, "qualify"] = np.nan
