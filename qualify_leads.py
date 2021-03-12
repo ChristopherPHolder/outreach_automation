@@ -52,22 +52,18 @@ def qualify_leads_fn(filename, wordlist):
             try:
                 print("Result for: ", url)
                 url = "https://" + url
-    #             req = requests.get(url, verify=False)
                 driver.get(url)
                 print('was with https')
             except:
                 url = "http://" + url
-    #             req = requests.get(url, verify=False)
                 driver.get(url)
                 print("Result for: ", url)
                 print('was with http')
         except Exception as e:
             print("Error obtaining page. Exception error:\n", e)
-        
-        # Filtrate links that contain key words
+
         elems = driver.find_elements_by_xpath("//a[@href]")
         list_of_urls_by_page = [elem.get_attribute("href") for elem in elems]
-        # print(list_of_urls_by_page)
         try:
             total_sublist = []
             for url_single in list_of_urls_by_page:
@@ -76,7 +72,6 @@ def qualify_leads_fn(filename, wordlist):
                     total_sublist.append(url_single)
         except:
             total_sublist = []
-        # print(total_sublist)
         totally.append(total_sublist)
         urls_with_subdomain.append(list(set(total_sublist)))
         counter += 1
@@ -84,12 +79,6 @@ def qualify_leads_fn(filename, wordlist):
         if counter == total_rows:
             break
 
-    # list_total = []
-
-    # Initializing new column
-    # df_web.loc[:, "qualify"] = np.nan
-
-    # Extract labels for classification
     types = wordlist.State.unique().tolist()
     types.remove("Subdomains")
 
@@ -101,12 +90,9 @@ def qualify_leads_fn(filename, wordlist):
         classifications_of_all_links_in_page = []
         for element in list_items:
             try:
-    #             rr = requests.get(element)
-    #             ss = BeautifulSoup(rr.text, "lxml")
                 driver.get(element)
                 ss = driver.page_source
                 text_found = re.search(r'text_to_search', ss)
-    #             self.assertNotEqual(text_found, None)
                 if text_found:
                     print(index + "successful request .. len: ", len(text_found))
             except Exception as e:
@@ -139,8 +125,6 @@ def qualify_leads_fn(filename, wordlist):
     def priorities(list_of_items):
         qualifying = []
         for items in list_of_items:
-            # total_links.append(len(item))
-            # prioridad del No sobre 
             if (("NoHire" in items) and ("HireNow" in items) and ("YesHire" in items)) or (("NoHire" in items) and ("HireNow" in items)) or (("NoHire" in items) and ("YesHire" in items)):
                 status = "NoHire"
             elif ("MaybeHire" in items) and ("HireNow" in items) and ("YesHire" in items) and len(list(set(items)))==3:
@@ -173,8 +157,6 @@ def qualify_leads_fn(filename, wordlist):
 
     df_web.insert(loc= 2, column='URL', value = urls_with_subdomain)
     df_no_web.insert(loc= 2, column='URL', value = '')
-
-    # tags = df_web['Qualifier'].apply(set_value, args =(assigning_tag, ))
 
     df_t = df_web.append(df_no_web, ignore_index=True, sort=False)
 
