@@ -6,9 +6,6 @@ import re
 import pandas as pd
 from tqdm import tqdm
 
-from comp.get_user_input import get_leadsfile_ql
-
-
 def add_url(filename):
     # Importing data with urls
     df = pd.read_excel("leads/" + filename + ".xlsx")
@@ -59,12 +56,8 @@ def add_url(filename):
     for company_name in tqdm(list_of_company_names):
         list_of_links = google_search(company_name)
         match_by_link = []
+        
         for link in list_of_links:
-            # try:
-            #     page = requests.get(link)
-            #     soup = BeautifulSoup(comp1.text, 'lxml')
-            # except:
-            #     soup = ''
             key_words = company_name.lower().split(" ")
             m = re.search("^(?:[^\/]*\/){2}[^\/]+", link)
             n = m.group(0)
@@ -82,8 +75,6 @@ def add_url(filename):
     df_web.insert(loc=0, column="URL", value="")
 
     df_t = df_web.append(df_no_web, ignore_index=True, sort=False)
-    # df_concat = pd.concat([df_web, df_no_web], axis=0)
-    # print('df_concat: ', df_concat)
 
     n = df_t.shape[0]
     for i in range(n):
