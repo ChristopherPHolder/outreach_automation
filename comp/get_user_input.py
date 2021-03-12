@@ -4,9 +4,12 @@ def get_wordlist_ql():
     wordlistfile = input("Insert wordlist: ")
     if wordlistfile == "":
         print("The default wordlist used")
-        wordlistfile = "wordlist.xlsx"
+        wordlistfile = "wordlist"
+        return wordlistfile
+    
+def open_wordlist(wordlistfile):   
     try: 
-        wordlist = pd.read_excel("wordlist/" + wordlistfile)
+        wordlist = pd.read_excel("wordlist/" + wordlistfile + ".xlsx")
         print("Succesfully imported wordlist from: " + wordlistfile)
         return wordlist
 
