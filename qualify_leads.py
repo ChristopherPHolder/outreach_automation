@@ -1,20 +1,10 @@
-import requests
-from bs4 import BeautifulSoup
-import urllib.parse
-from urllib.parse import urlparse
 import re
 import pandas as pd
-from tqdm import tqdm
 import numpy as np
-
-from comp.get_user_input import get_wordlist_ql, get_leadsfile_ql
-
 
 from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
-
-
 
 def qualify_leads_fn(filename, wordlist):
 
