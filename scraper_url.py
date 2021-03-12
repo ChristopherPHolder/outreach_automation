@@ -96,6 +96,3 @@ def add_url(filename):
     df_t.to_excel("leads/" + filename + ".xlsx")
 
     return filename
-
-filename = get_leadsfile_ql()
-add_url(filename)

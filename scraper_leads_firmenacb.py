@@ -236,5 +236,3 @@ def scrape_firmenabc():
     driver.close()
 
     return filename
-
-scrape_firmenabc()
