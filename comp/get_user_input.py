@@ -1,8 +1,5 @@
 import pandas as pd
 
-# Important! this return file names they do not include paths! 
-# Paths must be added afterwords depending on use
-# Importing wordlist
 def get_wordlist_ql():
     wordlistfile = input("Insert wordlist: ")
     if wordlistfile == "":
