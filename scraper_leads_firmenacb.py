@@ -16,8 +16,8 @@ def scrape_firmenabc():
         print("Company type was left empty")
 
     elif companytype == "s":
-        companytype = "Steuerberater"
-        print("Default Company type was selected. 'Steuerberater'")
+        companytype = "steuerberater"
+        print("Default Company type was selected. 'steuerberater'")
 
     location = input("Enter the location (Bezirk/Ort/Plz): ")
     if location == "t":
@@ -27,9 +27,11 @@ def scrape_firmenabc():
     elif location == "":
         print("Location was left empty")
 
+    # Limits the number of search results for testing 
     limit = int(input("Enter the percentage (number 0-100) of results to export: "))
     if limit == "":
         limit = 100
+    
     # Code necesary for the limit 
     limit_set = 0
 
@@ -177,8 +179,6 @@ def scrape_firmenabc():
             temp["Beginndatum der Rechtsform:"] = fechaInicioFormaJuridica
         except:
             temp["Beginndatum der Rechtsform:"] = ""
-            # print("error en fechaInicioFormaJuridica")
-        ############ extracting Haldelnde personen ############
         try:
             i = 0
             condition = True
@@ -189,7 +189,6 @@ def scrape_firmenabc():
                 list_of_strings = []
                 for a in accionistas:
                     b = a.text
-                    # print(b)
                     if b == "" and b.isspace():
                         print(".")
                     else:
@@ -210,7 +209,6 @@ def scrape_firmenabc():
                                 temp["Anteil" + " - " + str(n)] = accionistas[3][7:]
                             list_acc.append(dictjsn)
 
-                            # temp["accionistas"] = list_acc
                         if len(accionistas) == 1:
                             temp[accionistas[0] + " - " + str(1)] = accionistas[1:]
 
@@ -221,6 +219,7 @@ def scrape_firmenabc():
 
         alldetails.append(temp)
         
+        # Code to exit after passing a limit %
         limit_set += 1
         if limit_set == int(len(listOfLinks) * limit / 100):
             break
