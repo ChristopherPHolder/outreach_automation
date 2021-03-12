@@ -182,7 +182,3 @@ def qualify_leads_fn(filename, wordlist):
     df_t.to_excel("leads/" + filename + ".xlsx")
 
     return filename
-
-wordlist = get_wordlist_ql()
-filename = get_leadsfile_ql()
-qualify_leads_fn(filename, wordlist)
