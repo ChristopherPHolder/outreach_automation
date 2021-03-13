@@ -34,7 +34,8 @@ def operation_caller():
 def full_operation():
     filename = scrape_firmenabc()
     filename = add_url(filename)
-    wordlist = "wordlist"
+    wordlistfile = "wordlist"
+    wordlist = open_wordlist(wordlistfile) 
     qualify_leads_fn(filename, wordlist)
 
 def uq_operation():
