@@ -33,7 +33,6 @@ def qualify_leads_fn(filename, wordlist):
     counter = 0
     list_of_urls = df_web.Web.tolist()
     totally = []
-    totally_content = []
     urls_with_subdomain = []
     for url in list_of_urls:
         print("<--------------------------------------------------> ", counter + 1)
