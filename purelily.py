@@ -47,7 +47,7 @@ def uq_operation():
 
 def q_operation():
     filename = get_leadsfile_ql()
-    wordlistfile = get_wordlist_ql()
+    wordlistfile = "wordlist"
     wordlist = open_wordlist(wordlistfile) 
     qualify_leads_fn(filename, wordlist)
     
