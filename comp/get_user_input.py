@@ -73,3 +73,21 @@ def get_search_limit():
     
     elif  0 < limit > 100:
         return limit
+
+def open_excel():
+    leadsfile = input("\nInsert leads: ")
+    
+    # Import generic file for testing
+    if leadsfile == "t":
+        print("The the testing leads file was used.")
+        leadsfile = "steuerberater_kärnten_test"
+    try:
+        df = pd.read_excel("leads/" + leadsfile + ".xlsx")
+        print("Succesfully imported leads from: " + leadsfile + ".xlsx")
+        return df
+
+    except FileNotFoundError:
+        print("\nError: leads file not found!\
+            \n Check if you did any typos and that the file is in the correct folder\
+            \nOnce you found the error, try to run the program again.")
+        quit()
