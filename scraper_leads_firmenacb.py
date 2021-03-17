@@ -39,13 +39,17 @@ def scrape_firmenabc():
     driver.get("https://www.firmenabc.at/")
 
     # Wait for cookie popup to load
-    time.sleep(5)
-
-    # Accept cookie popup
-    cookiesHandle = driver.find_element_by_xpath(
-        '//*[@id="CybotCookiebotDialogBodyLevelButtonLevelOptinAllowAll"]'
-    )
-    cookiesHandle.click()
+    while True:
+        try:
+            # Accept cookie popup
+            cookiesHandle = driver.find_element_by_xpath(
+                '//*[@id="CybotCookiebotDialogBodyLevelButtonLevelOptinAllowAll"]'
+            )
+            cookiesHandle.click()
+            break
+        except:
+            # Wait a sec to see if its there now
+            time.sleep(1)
 
     # Input user input into search
     searchInput1 = driver.find_element_by_xpath('//*[@id="what"]')
