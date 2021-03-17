@@ -1,7 +1,9 @@
 from scraper_leads_firmenacb import scrape_firmenabc
 from scraper_url import add_url
 from qualify_leads import qualify_leads_fn
-from comp.get_user_input import get_leadsfile_ql, get_wordlist_ql, open_wordlist
+from comp.get_user_input import get_leadsfile_ql, get_wordlist_ql, open_wordlist, open_excel
+from temp_filler import extract_lead_data
+
 
 def operation_caller():
     print(" What operation would you like to run?\
@@ -9,7 +11,8 @@ def operation_caller():
         \nTo scrape additional URLSs for and existing file type 'U' and return/enter\
         \nTo qualify leads from an existing file type 'Q' and return/enter\
         \nTo scrape additional URLs and qualify the leads type 'UQ' and return/enter\
-        \nTo complete all task as one operation leave the field emtry and return/enter")
+        \nTo complete all task as one operation leave the field emtry and return/enter\
+        \nTo create outreach word files from the exel file 'W' and return/enter")
     operator = input("Operation: ")
 
     if operator == '':
@@ -27,6 +30,9 @@ def operation_caller():
 
     elif operator == 'UQ' or operator == 'uq':
         uq_operation()
+    
+    elif operator == 'W' or operator == 'w':
+        w_operation()
 
     else: 
         print("Invalid input, try running it again with the recomended inputs\n")
@@ -51,10 +57,11 @@ def q_operation():
     wordlist = open_wordlist(wordlistfile) 
     qualify_leads_fn(filename, wordlist)
     
-def word_maker():
-    # Open excel
+def w_operation():
+    data = open_excel()
+    df = extract_lead_data(data)
+    print(df)
     # Extract useful information
     # Introduce it into a template
-    return TODO
 
 operation_caller()
