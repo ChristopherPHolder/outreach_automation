@@ -51,5 +51,10 @@ def q_operation():
     wordlist = open_wordlist(wordlistfile) 
     qualify_leads_fn(filename, wordlist)
     
+def word_maker():
+    # Open excel
+    # Extract useful information
+    # Introduce it into a template
+    return TODO
 
 operation_caller()
