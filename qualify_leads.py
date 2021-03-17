@@ -6,6 +6,8 @@ from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 
+import time
+
 def qualify_leads_fn(filename, wordlist):
 
     # Open leadsfile
@@ -50,9 +52,16 @@ def qualify_leads_fn(filename, wordlist):
                 print('was with http')
         except Exception as e:
             print("Error obtaining page. Exception error:\n", e)
+        
+        while True:
+            try:
+                elems = driver.find_elements_by_xpath("//a[@href]")
+                list_of_urls_by_page = [elem.get_attribute("href") for elem in elems]
+                break
+            except:
+                time.sleep(3)
+                print("\n Waiting for 3 second \nIt is pobably a modern web framework")
 
-        elems = driver.find_elements_by_xpath("//a[@href]")
-        list_of_urls_by_page = [elem.get_attribute("href") for elem in elems]
         try:
             total_sublist = []
             for url_single in list_of_urls_by_page:
