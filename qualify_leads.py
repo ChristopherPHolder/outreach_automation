@@ -53,6 +53,7 @@ def qualify_leads_fn(filename, wordlist):
         except Exception as e:
             print("Error obtaining page. Exception error:\n", e)
         
+        # Waits if using an modern frontend framework to get links
         while True:
             try:
                 elems = driver.find_elements_by_xpath("//a[@href]")
