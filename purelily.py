@@ -3,15 +3,18 @@ from scraper_url import add_url
 from qualify_leads import qualify_leads_fn
 from comp.get_user_input import get_leadsfile_ql, get_wordlist_ql, open_wordlist, open_excel
 from temp_filler import extract_lead_data
+from leads_cleaner import clean_leads
 
 
 def operation_caller():
+    # Printing general usage information for final user.
     print(" What operation would you like to run?\
         \nTo scrape leads from firmenabc type 'F' and return/enter\
         \nTo scrape additional URLSs for and existing file type 'U' and return/enter\
         \nTo qualify leads from an existing file type 'Q' and return/enter\
         \nTo scrape additional URLs and qualify the leads type 'UQ' and return/enter\
         \nTo complete all task as one operation leave the field emtry and return/enter\
+        \nTo extract the information for mails and tempales type 'C' and return/enter\
         \nTo create outreach word files from the exel file 'W' and return/enter")
     operator = input("Operation: ")
 
@@ -30,6 +33,9 @@ def operation_caller():
 
     elif operator == 'UQ' or operator == 'uq':
         uq_operation()
+
+    elif operator == 'C' or operator == 'c':
+        c_operation()
     
     elif operator == 'W' or operator == 'w':
         w_operation()
@@ -56,12 +62,24 @@ def q_operation():
     wordlistfile = "wordlist"
     wordlist = open_wordlist(wordlistfile) 
     qualify_leads_fn(filename, wordlist)
-    
+
+# Extracts information to only leave the information necesary for the postal mails and templates
+def c_operation():
+    leads_file = get_leadsfile_ql()
+    cleaned_leads = clean_leads(leads_file)
+    # Opens the excel
+    # Move the boss filed to its correct location
+    # Remove all un necesary information
+    # Export it as a new file in a new directory
+    return cleaned_leads
+
 def w_operation():
     data = open_excel()
     df = extract_lead_data(data)
     print(df)
     # Extract useful information
     # Introduce it into a template
+
+
 
 operation_caller()
