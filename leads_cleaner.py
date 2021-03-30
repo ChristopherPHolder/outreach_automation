@@ -54,6 +54,5 @@ def remove_extra_bosses(df):
     for i in df.columns:
         if i not in imp_info:
             df = df.drop(columns=i)
-            #print("Droped: " + str(i))
 
     return df
