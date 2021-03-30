@@ -2,8 +2,8 @@ from scraper_leads_firmenacb import scrape_firmenabc
 from scraper_url import add_url
 from qualify_leads import qualify_leads_fn
 from comp.get_user_input import get_leadsfile_ql, get_wordlist_ql, open_wordlist, open_excel
-from temp_filler import extract_lead_data
 from leads_cleaner import clean_leads
+from temp_filler import fill_temp 
 
 
 def operation_caller():
@@ -71,11 +71,8 @@ def c_operation():
     return df
 
 def w_operation():
-    data = open_excel()
-    df = extract_lead_data(data)
-    print(df)
-    # Extract useful information
-    # Introduce it into a template
-
+    filename = get_leadsfile_ql()
+    fill_temp(filename)
+    print('templates where sucessfully created')
 
 operation_caller()
