@@ -65,13 +65,10 @@ def q_operation():
 
 # Extracts information to only leave the information necesary for the postal mails and templates
 def c_operation():
-    leads_file = get_leadsfile_ql()
-    cleaned_leads = clean_leads(leads_file)
-    # Opens the excel
-    # Move the boss filed to its correct location
-    # Remove all un necesary information
-    # Export it as a new file in a new directory
-    return cleaned_leads
+    filename = get_leadsfile_ql()
+    df = clean_leads(filename)
+    df.to_excel("leads/cleaned/" + filename + '_clean' + ".xlsx")
+    return df
 
 def w_operation():
     data = open_excel()
