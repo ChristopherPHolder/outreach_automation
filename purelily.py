@@ -67,7 +67,7 @@ def q_operation():
 def c_operation():
     filename = get_leadsfile_ql()
     df = clean_leads(filename)
-    df.to_excel("leads/cleaned/" + filename + '_clean' + ".xlsx")
+    df.to_excel("leads/" + filename + '_clean' + ".xlsx")
     return df
 
 def w_operation():
@@ -76,7 +76,6 @@ def w_operation():
     print(df)
     # Extract useful information
     # Introduce it into a template
-
 
 
 operation_caller()
