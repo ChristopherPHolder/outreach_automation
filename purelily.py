@@ -16,7 +16,7 @@ def operation_caller():
         \nTo complete all tasks mentioned as one operation leave the field emtry and return/enter\
         \nTo extract the information for mails and templates type 'C' and return/enter\
         \nTo create outreach word files from the exel file 'W' and return/enter\
-        \nTo extract to extract informations for mails and the word files type 'WC' and return/enter\
+        \nTo extract to extract informations for mails and the word files type 'CW' and return/enter\
         \nTo complete all tasks mentioned as one operation type 'X' and return/enter")
     operator = input("Operation: ")
 
