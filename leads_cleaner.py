@@ -29,7 +29,9 @@ def find_boss(df):
                         try: 
                             boss = z + ' - ' + str(x) # Extracts boss name/title as in excel sheet
                             if pd.isnull(df[boss][i]) == False: # Checks if cell is emprty or if boss is name is there
-                                df['Geschäftsführer - 1'][i] = df[boss][i] # Adds the boss is name as boss 1
+                                x = df[boss][i].split() # Split field into a list
+                                if x[0] != Firma: # Check that first word is not a company name
+                                    df['Geschäftsführer - 1'][i] = df[boss][i] # Adds the boss is name as boss 1
                         except KeyError: # In case boss title is out of range
                             break
     return df

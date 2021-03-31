@@ -94,5 +94,4 @@ def full_operation_x():
     filename = clean_leads(filename)
     fill_temp(filename)
 
-
 operation_caller()
