@@ -2,14 +2,16 @@ from docxtpl import DocxTemplate
 import pandas as pd
 
 def fill_temp(filename):
-    df = pd.read_excel("leads/" + filename + '_clean' + ".xlsx") # Opens excel file into dataframe
+    df = pd.read_excel("leads/" + filename + ".xlsx") # Opens excel file into dataframe
     bosses = split_name(df) # Gets list of bosses and there information
 
     # Iterates over each boss and creates word file
     for boss in bosses: # Itereates over list of bosses
         doc = DocxTemplate("word_templates/cold_postmail_1.docx") # Open template
         doc.render(boss) # Introduces data into template 
-        doc.save("pending_post/postmail" + str(boss['id']) + ".docx") # Creates new word file
+        doc.save("pending_post/postmail_" + filename + str(boss['_id']) + ".docx") # Creates new word file
+
+    
 
 # Creates a list of dicts with the information of the bosses
 def split_name(df):

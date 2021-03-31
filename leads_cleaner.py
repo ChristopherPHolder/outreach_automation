@@ -3,7 +3,10 @@ def clean_leads(filename):
     df = pd.read_excel("leads/" + filename + ".xlsx") # Opens excel file
     df = find_boss(df) # Finds the boss and passes him to the correct column
     df = remove_extra_bosses(df) # Removes all unnecesary columns
-    return df
+    filename = filename + '_clean' # Update filename
+    df.to_excel("leads/" + filename + ".xlsx") # Creates new Excel file
+    
+    return filename
     
 def find_boss(df): 
     # Creates list of priorities
