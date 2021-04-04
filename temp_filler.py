@@ -28,7 +28,7 @@ def split_name(df):
                     bosses.append({
                         'id': i,
                         'title': x[0], 
-                        'last_name': x[1], 
+                        'last_name': x[1].replace(',', ''), 
                         'first_name': x[len(x) - 1]
                         })
 
@@ -39,7 +39,7 @@ def split_name(df):
                     bosses.append({
                         'id': i,
                         'title': x[0], 
-                        'last_name': x[2], 
+                        'last_name': x[2].replace(',', ''), 
                         'first_name': x[len(x) - 1]
                         })
 
@@ -56,4 +56,5 @@ def split_name(df):
 
     for boss in bosses:
         print(boss['last_name'])
+    
     return bosses
