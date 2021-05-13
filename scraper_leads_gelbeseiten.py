@@ -72,6 +72,9 @@ def scrape_gelbesieten():
     ).move_by_offset(250, 0).release().perform()
 
     # Get complete list of leads in the location
+    current_list_size = driver.find_element_by_xpath(
+        '//*[@id="loadMoreGezeigteAnzahl"]'
+    ).text
     while True:
         try:
             button_mehr_anzeigen = driver.find_element_by_xpath(
@@ -81,3 +84,5 @@ def scrape_gelbesieten():
             time.sleep(2)
         except ElementNotInteractableException:
             break
+
+    # Extract the information from individual leads
