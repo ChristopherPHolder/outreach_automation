@@ -1,4 +1,6 @@
 from scraper_leads_firmenacb import scrape_firmenabc
+from scraper_leads_gelbeseiten import scrape_gelbesieten
+
 from scraper_url import add_url
 from qualify_leads import qualify_leads_fn
 from comp.get_user_input import get_leadsfile_ql, get_wordlist_ql, open_wordlist, open_excel
@@ -9,6 +11,7 @@ from temp_filler import fill_temp
 def operation_caller():
     # Printing general usage information for final user.
     print(" What operation would you like to run?\
+        \nTo scrape from  To scrape leads from GelbeSeiten type 'G' and return/enter\
         \nTo scrape leads from firmenabc type 'F' and return/enter\
         \nTo scrape additional URLSs for and existing file type 'U' and return/enter\
         \nTo qualify leads from an existing file type 'Q' and return/enter\
@@ -22,6 +25,9 @@ def operation_caller():
 
     if operator == '':
         full_operation()
+
+    elif operator == 'G' or operator == 'g':
+        scrape_gelbesieten()
 
     elif operator == 'F' or operator == 'f':
         scrape_firmenabc()
