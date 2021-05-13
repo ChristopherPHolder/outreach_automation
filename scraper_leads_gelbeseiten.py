@@ -3,11 +3,13 @@ from selenium import webdriver
 from selenium.webdriver import ActionChains
 
 # Exception handling for radius input range 
-from selenium.common.exceptions import NoSuchElementException
-from selenium.common.exceptions import StaleElementReferenceException
+from selenium.common.exceptions import NoSuchElementException, \
+    StaleElementReferenceException, ElementNotInteractableException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
+
+ElementNotInteractableException
 
 import time  # Library to allow waiting and sleep
 
@@ -26,7 +28,7 @@ def scrape_gelbesieten():
             cookiesHandle.click()
             break
         except: 
-            time.sleep(1)
+            time.sleep(2)
 
     # Fill in search inputs 
     search_input_was = driver.find_element_by_xpath(
@@ -68,3 +70,14 @@ def scrape_gelbesieten():
     move_radius_range_input.click_and_hold(
         search_radius_range_input
     ).move_by_offset(250, 0).release().perform()
+
+    # Get complete list of leads in the location
+    while True:
+        try:
+            button_mehr_anzeigen = driver.find_element_by_xpath(
+                '//*[@id="mod-LoadMore--button"]'
+            )
+            button_mehr_anzeigen.click()
+            time.sleep(2)
+        except ElementNotInteractableException:
+            break
