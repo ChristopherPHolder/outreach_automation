@@ -95,3 +95,26 @@ def scrape_gelbesieten():
             time.sleep(2)
         except ElementNotInteractableException:
             break
+
+    # Create DataFrame
+    geschaftsfuhrer = []
+    bezirk_ort_plz = []
+    firmenname = []
+    strasse = []
+    plz = []
+    stadt = []
+    tel = []
+    mail = []
+    web = []
+
+    lead_info = {
+        'Geschäftsführer': geschaftsfuhrer, 
+        'Bezirk/Ort/Plz': bezirk_ort_plz, 
+        'Firmenname': firmenname, 
+        'Straße': strasse,
+        'PLZ': plz, 
+        'Stadt': stadt,
+        'Tel': tel, 
+        'Mail': mail, 
+        'Web': web,
+    }
