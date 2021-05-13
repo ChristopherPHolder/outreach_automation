@@ -72,10 +72,21 @@ def scrape_gelbesieten():
     ).move_by_offset(250, 0).release().perform()
 
     # Get complete list of leads in the location
-    current_list_size = driver.find_element_by_xpath(
+    initial_list_size = driver.find_element_by_xpath(
         '//*[@id="loadMoreGezeigteAnzahl"]'
     ).text
+    initial_time = time.perf_counter()
     while True:
+        current_list_size = driver.find_element_by_xpath(
+            '//*[@id="loadMoreGezeigteAnzahl"]'
+        ).text
+        if current_list_size == initial_list_size:
+            if (time.perf_counter() - initial_time) > 300:
+                print('Error: page took longer then 5 min \
+                    to load next set of content')
+                exit()
+        else:
+            initial_list_size = current_list_size
         try:
             button_mehr_anzeigen = driver.find_element_by_xpath(
                 '//*[@id="mod-LoadMore--button"]'
@@ -84,5 +95,3 @@ def scrape_gelbesieten():
             time.sleep(2)
         except ElementNotInteractableException:
             break
-
-    # Extract the information from individual leads
