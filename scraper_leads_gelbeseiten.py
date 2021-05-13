@@ -84,7 +84,6 @@ def scrape_gelbesieten():
     ).text
     print('Downloading data from:', complete_list_size, 'leads')
     while True:
-        print(current_list_size, end = ' --> ')
         current_list_size = driver.find_element_by_xpath(
             '//*[@id="loadMoreGezeigteAnzahl"]'
         ).text
@@ -95,6 +94,7 @@ def scrape_gelbesieten():
                 exit()
         else:
             initial_list_size = current_list_size
+            print(current_list_size,end='')
         try:
             button_mehr_anzeigen = driver.find_element_by_xpath(
                 '//*[@id="mod-LoadMore--button"]'
@@ -115,39 +115,56 @@ def scrape_gelbesieten():
     mail = []
     web = []
     nan = float('NaN')
-    print('Processing lead data.')
+    
+    print('\nProcessing lead data.')
+    
     for i in range(int(current_list_size)):
         lead = i + 1
-        print("Lead #", lead)
-        firmenname.append(
+        l = (len(firmenname) - 1)
+        print("Lead #", (l+1) , '--', lead)
+
+        move = ActionChains(driver)
+        move.move_to_element(
             driver.find_element_by_xpath(
+                f'//*[@id="gs_treffer"]/div/article[{lead}]'
+            )
+        ).perform()
+        time.sleep(0.5)
+
+        try:
+            companyname = driver.find_element_by_xpath(
                 f'//*[@id="gs_treffer"]/div/article[{lead}]/a/h2'
-            ).text
-        )
-        print('Company Name:', firmenname[i])
+            )
+        except:
+            print('Error: downloading the lead does not follow the same format')
+            continue
+
+        firmenname.append(companyname.text)
+        print('Company Name:', firmenname[l])
 
         geschaftsfuhrer.append(nan)
 
-        
         address = driver.find_element_by_xpath(
             f'//*[@id="gs_treffer"]/div/article[{lead}]/a/address/p[1]'
         ).text
         
-        address_split = re.split(',|\(|\)', address)
+        address_space_split = address.split(' ')
 
-        bezirk_ort_plz.append(address_split[2])
-        print('District:', bezirk_ort_plz[i])
-        
-        strasse.append(address_split[0])
-        print('Street:', strasse[i])
+        bezirk = (address_space_split[len(address_space_split) - 3]
+        ).replace('(', '').replace(')','')
+        bezirk_ort_plz.append(bezirk)
+        print('District:', bezirk_ort_plz[l])
 
-        address_re_split = address_split[1].split(' ')
+        stadt.append(address_space_split[len(address_space_split) - 4])
+        print('City:', stadt[l])
 
-        plz.append(address_re_split[1])
-        print('Postal:', plz[i])
+        address_coma_split = address.split(',')
+        strasse.append(address_coma_split[0])
+        print('Street:', strasse[l])
 
-        stadt.append(address_re_split[2])
-        print('City:', stadt[i])
+        plz.append(address_coma_split[1])
+        print('Postal:', plz[l])
+
 
         try:
             tel.append(
@@ -157,7 +174,7 @@ def scrape_gelbesieten():
             )
         except NoSuchElementException:
             tel.append(nan)
-        print('Phone:', tel[i])
+        print('Phone:', tel[l])
 
         try:
             mail_link = driver.find_element_by_xpath(
@@ -167,16 +184,24 @@ def scrape_gelbesieten():
             mail.append(mail_link_re_split[1])
         except NoSuchElementException:
             mail.append(nan)
-        print('Email:', mail[i])
+        print('Email:', mail[l])
         try:
-            web.append(
+            # Check if it said gelbeseite is its site 
+            url = (
                 driver.find_element_by_xpath(
                     f'//*[@id="gs_treffer"]/div/article[{lead}]/div/div/a[1]'
                 ).get_attribute('href')
             )
+            url_dot_split = url.split('.')
+            if 'gelbeseiten' in url_dot_split:
+                url = nan
+            
+            web.append(url)
+
         except NoSuchElementException:
             web.append(nan)
-        print('Web:', web[i])
+
+        print('Web:', web[l])
 
     # Creating DataFrame
     lead_data = {
@@ -192,4 +217,7 @@ def scrape_gelbesieten():
     }
 
     df = pd.DataFrame(data=lead_data)
+    pd.set_option('display.max_rows', None)
     print(df)
+
+    driver.close()
