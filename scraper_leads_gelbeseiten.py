@@ -14,6 +14,7 @@ import re # Library for resplting data
 import pandas as pd # Library to store and export data formated as a table
 
 def scrape_gelbesieten():
+    print('Starting up scraper')
     driver = webdriver.Chrome(ChromeDriverManager().install())
     driver.get("https://www.gelbeseiten.de/")
 
@@ -78,7 +79,12 @@ def scrape_gelbesieten():
 
     time.sleep(15) # Allows banner add to move out the way
 
+    complete_list_size = driver.find_element_by_xpath(
+        '//*[@id="loadMoreGesamtzahl"]'
+    ).text
+    print('Downloading data from:', complete_list_size, 'leads')
     while True:
+        print(current_list_size, end = ' --> ')
         current_list_size = driver.find_element_by_xpath(
             '//*[@id="loadMoreGezeigteAnzahl"]'
         ).text
@@ -109,43 +115,59 @@ def scrape_gelbesieten():
     mail = []
     web = []
     nan = float('NaN')
-    for lead in range(int(current_list_size)):
-        geschaftsfuhrer.append(nan)
-
-        address = driver.find_element_by_xpath(
-            f'//*[@id="gs_treffer"]/div/article[{lead+1}]/a/address/p[1]'
-        ).text
-        address_split = re.split(',|\(|\)', address)
-        address_re_split = address_split[1].split(' ')
-
-        bezirk_ort_plz.append(address_split[2])
-
+    print('Processing lead data.')
+    for i in range(int(current_list_size)):
+        lead = i + 1
+        print("Lead #", lead)
         firmenname.append(
             driver.find_element_by_xpath(
-                f'//*[@id="gs_treffer"]/div/article[{lead+1}]/a/h2'
+                f'//*[@id="gs_treffer"]/div/article[{lead}]/a/h2'
             ).text
         )
+        print('Company Name:', firmenname[i])
+
+        geschaftsfuhrer.append(nan)
+
+        
+        address = driver.find_element_by_xpath(
+            f'//*[@id="gs_treffer"]/div/article[{lead}]/a/address/p[1]'
+        ).text
+        
+        address_split = re.split(',|\(|\)', address)
+
+        bezirk_ort_plz.append(address_split[2])
+        print('District:', bezirk_ort_plz[i])
+        
         strasse.append(address_split[0])
+        print('Street:', strasse[i])
+
+        address_re_split = address_split[1].split(' ')
 
         plz.append(address_re_split[1])
+        print('Postal:', plz[i])
 
         stadt.append(address_re_split[2])
+        print('City:', stadt[i])
+
         try:
             tel.append(
                 driver.find_element_by_xpath(
-                    f'//*[@id="gs_treffer"]/div/article[{lead+1}]/a/address/p[2]'
+                    f'//*[@id="gs_treffer"]/div/article[{lead}]/a/address/p[2]'
                 ).text
             )
         except NoSuchElementException:
             tel.append(nan)
+        print('Phone:', tel[i])
+
         try:
             mail_link = driver.find_element_by_xpath(
-                f'//*[@id="gs_treffer"]/div/article[{lead+1}]/div/div/a[2]'
+                f'//*[@id="gs_treffer"]/div/article[{lead}]/div/div/a[2]'
             ).get_attribute('href')
             mail_link_re_split = re.split('\:|\?', mail_link)
             mail.append(mail_link_re_split[1])
         except NoSuchElementException:
             mail.append(nan)
+        print('Email:', mail[i])
         try:
             web.append(
                 driver.find_element_by_xpath(
@@ -154,6 +176,7 @@ def scrape_gelbesieten():
             )
         except NoSuchElementException:
             web.append(nan)
+        print('Web:', web[i])
 
     # Creating DataFrame
     lead_data = {
