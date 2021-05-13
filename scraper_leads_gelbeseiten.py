@@ -9,9 +9,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 
-ElementNotInteractableException
-
 import time  # Library to allow waiting and sleep
+import re # Library for resplting data
 
 def scrape_gelbesieten():
     driver = webdriver.Chrome(ChromeDriverManager().install())
@@ -96,7 +95,7 @@ def scrape_gelbesieten():
         except ElementNotInteractableException:
             break
 
-    # Create DataFrame
+    # Initializing list
     geschaftsfuhrer = []
     bezirk_ort_plz = []
     firmenname = []
@@ -107,6 +106,48 @@ def scrape_gelbesieten():
     mail = []
     web = []
 
+    for lead in range(current_list_size):
+        geschaftsfuhrer.append(NaN = float('NaN'))
+        
+        address = driver.find_element_by_xpath(
+            f'//*[@id="gs_treffer"]/div/article[{lead}]/a/address/p[1]'
+        ).text
+        address_split = re.split(',|\(|\)', address)
+        address_re_split = address_split[1].split(' ')
+
+        bezirk_ort_plz.append(address_split[2])
+
+        firmenname.append(
+            driver.find_element_by_xpath(
+                f'//*[@id="gs_treffer"]/div/article[{lead}]/a/h2'
+            ).text
+        )
+
+        strasse.append(address_split[0])
+
+        plz.append(address_re_split[1])
+
+        stadt.append(address_re_split[2])
+
+        tel.append(
+            driver.find_element_by_xpath(
+                f'//*[@id="gs_treffer"]/div/article[{lead}]/a/address/p[2]'
+            ).text
+        )
+
+        mail_link = driver.find_element_by_xpath(
+            f'//*[@id="gs_treffer"]/div/article[{lead}]/div/div/a[2]'
+        ).get_attribute('href')
+        mail_link_re_split = re.split('\:|\?', mail_link)
+        mail.append(mail_link_re_split[1])
+
+        web.append(
+            driver.find_element_by_xpath(
+                f'//*[@id="gs_treffer"]/div/article[{lead}]/div/div/a[1]'
+            ).get_attribute('href')
+        )
+
+    # Creating DataFrame
     lead_info = {
         'Geschäftsführer': geschaftsfuhrer, 
         'Bezirk/Ort/Plz': bezirk_ort_plz, 
