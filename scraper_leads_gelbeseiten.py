@@ -98,7 +98,7 @@ def scrape_gelbesieten(company_type, location):
                 '//*[@id="loadMoreGezeigteAnzahl"]'
             ).text
             if current_list_size == initial_list_size:
-                if (time.perf_counter() - initial_time) > 300:
+                if (time.perf_counter() - initial_time) > 150:
                     print('Error: page took longer then 5 min \
                         to load next set of content')
                     exit()
@@ -157,26 +157,24 @@ def scrape_gelbesieten(company_type, location):
 
         geschaftsfuhrer.append(nan)
 
-        address = driver.find_element_by_xpath(
-            f'//*[@id="gs_treffer"]/div/article[{lead}]/a/address/p[1]'
-        ).text
-        
-        address_space_split = address.split(' ')
+        try:
+            address = driver.find_element_by_xpath(
+                f'//*[@id="gs_treffer"]/div/article[{lead}]/a/address/p[1]'
+            ).text
+            # print(address)
+            address_dict = parse_address(address)
 
-        bezirk = (address_space_split[len(address_space_split) - 3]
-        ).replace('(', '').replace(')','')
-        bezirk_ort_plz.append(bezirk)
-        #print('District:', bezirk_ort_plz[l])
+            bezirk_ort_plz.append(address_dict['Bezirk'])
+            strasse.append(address_dict['Strasse'])
+            plz.append(address_dict['Plz'])
+            stadt.append(address_dict['Stadt'])
 
-        stadt.append(address_space_split[len(address_space_split) - 4])
-        #print('City:', stadt[l])
+        except NoSuchElementException:
+            bezirk_ort_plz.append(nan)
+            strasse.append(nan)
+            plz.append(nan)
+            stadt.append(nan)
 
-        address_coma_split = address.split(',')
-        strasse.append(address_coma_split[0])
-        #print('Street:', strasse[l])
-
-        plz.append(address_coma_split[1])
-        #print('Postal:', plz[l])
 
         try:
             tel.append(
@@ -219,10 +217,7 @@ def scrape_gelbesieten(company_type, location):
         except NoSuchElementException:
             web.append(nan)
 
-        #print('Web:', web[l])
-    print(
-        len(geschaftsfuhrer), len(bezirk_ort_plz), len(firmenname), len(strasse),
-        len(plz), len(stadt),len(tel), len(mail), len(web))
+
     # Creating DataFrame
     lead_data = {
         'Geschäftsführer': geschaftsfuhrer, 
@@ -240,3 +235,42 @@ def scrape_gelbesieten(company_type, location):
     pd.set_option('display.max_rows', None)
     driver.close()
     return df
+
+def parse_address(address):
+
+    address_dict = {}
+
+    # Extract strasse
+    address_coma_split = address.split(',')
+    address_dict['Strasse'] = address_coma_split[0]
+
+    # Extract plz
+    address_coma_split_1 = address_coma_split[1]
+    address_coma_split_1_space_split = address_coma_split_1.split(' ')
+    address_coma_split_1_space_split.remove('')
+
+    if address_coma_split_1_space_split[0].isnumeric():
+        address_dict['Plz'] =  address_coma_split_1_space_split[0]
+        address_coma_split_1_space_split.remove(address_coma_split_1_space_split[0])
+    else:
+        address_dict['Plz'] = float('NaN')
+
+    # Extract stadt
+    if address_coma_split_1_space_split[0].isnumeric() == False:
+        address_dict['Stadt'] = address_coma_split_1_space_split[0]
+        address_coma_split_1_space_split.remove(address_coma_split_1_space_split[0])
+    else:
+        address_dict['Stadt'] =float('NaN')
+
+    if address_coma_split_1_space_split[0].isnumeric() == False:
+        try:
+            # Extract bezirk
+            address_dict['Bezirk'] = address_coma_split_1_space_split[0].replace('(', '').replace(')', '') 
+        except IndexError:
+            pass
+    else:
+        address_dict['Bezirk'] = float('NaN')
+
+    
+
+    return address_dict
