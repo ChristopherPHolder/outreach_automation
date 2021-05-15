@@ -56,13 +56,16 @@ def get_company_type():
     elif companytype == "s":
         companytype = "Steuerberater"
         print("Default Company type was selected. 'Steuerberater'")
-        return companytype
+    
+    return companytype
 
 def get_company_location():
     location = input("Enter the location (Bezirk/Ort/Plz): ")
+
     if location == "":
         print("Company location was left empty")
-        return location
+
+    return location
 
 def get_search_limit():
     limit = int(input("Enter the percentage (number 0-100) of results to export: "))
