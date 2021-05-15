@@ -82,7 +82,7 @@ def scrape_gelbesieten(company_type, location):
     ).text
     initial_time = time.perf_counter()
 
-    for i in tqdm(range(300), ascii=True, desc='Pre-loading'):
+    for i in tqdm(range(300), desc='Pre-loading'):
         time.sleep(0.05) # Allows banner add to move out the way
 
     complete_list_size = driver.find_element_by_xpath(
@@ -129,7 +129,7 @@ def scrape_gelbesieten(company_type, location):
 
     #print('\nProcessing lead data.')
     
-    for i in tqdm(range(int(current_list_size)), ascii=True, desc='Processing'):
+    for i in tqdm(range(int(current_list_size)), desc='Processing'):
         lead = i + 1
         l = (len(firmenname) - 1)
         #print("Lead #", (l+1) , '--', lead)
@@ -256,11 +256,21 @@ def parse_address(address):
         address_dict['Plz'] = float('NaN')
 
     # Extract stadt
-    if address_coma_split_1_space_split[0].isnumeric() == False:
-        address_dict['Stadt'] = address_coma_split_1_space_split[0]
-        address_coma_split_1_space_split.remove(address_coma_split_1_space_split[0])
-    else:
-        address_dict['Stadt'] =float('NaN')
+    for i in range(len(address_coma_split_1_space_split)):
+        if i == 0:
+            if address_coma_split_1_space_split[0].isnumeric() == False:
+                stadt_dict = address_coma_split_1_space_split[0]
+                address_coma_split_1_space_split.remove(address_coma_split_1_space_split[0])
+        elif i != 0:
+            if address_coma_split_1_space_split[0].isnumeric() == False \
+                and '(' not in address_coma_split_1_space_split[0]:
+                stadt_dict += ' ' + address_coma_split_1_space_split[0]
+                address_coma_split_1_space_split.remove(address_coma_split_1_space_split[0])
+
+            address_dict['Stadt'] = stadt_dict
+            
+        else:
+            address_dict['Stadt'] = float('NaN')
 
     if address_coma_split_1_space_split[0].isnumeric() == False:
         try:
@@ -270,7 +280,5 @@ def parse_address(address):
             pass
     else:
         address_dict['Bezirk'] = float('NaN')
-
-    
 
     return address_dict
