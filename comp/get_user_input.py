@@ -6,6 +6,13 @@ def get_wordlist_ql():
         print("The default wordlist used")
         wordlistfile = "wordlist"
         return wordlistfile
+
+def get_wordlist_locations():
+    wordlistfile = input("Insert wordlist for locations: ")
+    if wordlistfile == "":
+        print("The default wordlist used")
+        wordlistfile = "all_german_cities"
+    return wordlistfile
     
 def open_wordlist(wordlistfile):   
     try: 
