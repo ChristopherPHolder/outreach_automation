@@ -76,11 +76,14 @@ def scrape_gelbesieten(company_type, location):
         search_radius_range_input
     ).move_by_offset(250, 0).release().perform()
 
-    # Get complete list of leads in the location
-    initial_list_size = driver.find_element_by_xpath(
-        '//*[@id="loadMoreGezeigteAnzahl"]'
-    ).text
-    initial_time = time.perf_counter()
+    try:
+        # Get complete list of leads in the location
+        initial_list_size = driver.find_element_by_xpath(
+            '//*[@id="loadMoreGezeigteAnzahl"]'
+        ).text
+        initial_time = time.perf_counter()
+    except NoSuchElementException:
+        return pd.DataFrame()
 
     for i in tqdm(range(300), desc='Pre-loading'):
         time.sleep(0.05) # Allows banner add to move out the way
@@ -90,7 +93,7 @@ def scrape_gelbesieten(company_type, location):
     ).text
     #print('Downloading data from:', complete_list_size, 'leads')
     with tqdm(
-        total=int(complete_list_size), ascii=True, 
+        total=int(complete_list_size), 
         initial=50, desc='Downloading') as pbar:
         downloading = True
         while downloading:
@@ -98,10 +101,10 @@ def scrape_gelbesieten(company_type, location):
                 '//*[@id="loadMoreGezeigteAnzahl"]'
             ).text
             if current_list_size == initial_list_size:
-                if (time.perf_counter() - initial_time) > 150:
+                if (time.perf_counter() - initial_time) > 60:
                     print('Error: page took longer then 5 min \
                         to load next set of content')
-                    exit()
+                    return pd.DataFrame()
             else:
                 pbar.update(int(current_list_size) - int(initial_list_size))
                 initial_list_size = current_list_size
@@ -111,9 +114,9 @@ def scrape_gelbesieten(company_type, location):
                     '//*[@id="mod-LoadMore--button"]'
                 )
                 button_mehr_anzeigen.click()
-                time.sleep(2)
+                time.sleep(0.5)
             except ElementNotInteractableException:
-                downloading = False
+                break
 
     # Initializing list
     geschaftsfuhrer = []
@@ -129,7 +132,7 @@ def scrape_gelbesieten(company_type, location):
 
     #print('\nProcessing lead data.')
     
-    for i in tqdm(range(int(current_list_size)), desc='Processing'):
+    for i in tqdm(range(int(current_list_size)), desc='Processing '):
         lead = i + 1
         l = (len(firmenname) - 1)
         #print("Lead #", (l+1) , '--', lead)
@@ -163,11 +166,26 @@ def scrape_gelbesieten(company_type, location):
             ).text
             # print(address)
             address_dict = parse_address(address)
+            
+            try:
+                bezirk_ort_plz.append(address_dict['Bezirk'])
+            except KeyError:
+                bezirk_ort_plz.append(nan)
 
-            bezirk_ort_plz.append(address_dict['Bezirk'])
-            strasse.append(address_dict['Strasse'])
-            plz.append(address_dict['Plz'])
-            stadt.append(address_dict['Stadt'])
+            try:
+                strasse.append(address_dict['Strasse'])
+            except KeyError:
+                strasse.append(nan)
+
+            try:
+                plz.append(address_dict['Plz'])
+            except KeyError:
+                plz.append(nan)
+
+            try:
+                stadt.append(address_dict['Stadt'])
+            except KeyError:
+                stadt.append(nan)
 
         except NoSuchElementException:
             bezirk_ort_plz.append(nan)
@@ -247,15 +265,22 @@ def parse_address(address):
     # Extract plz
     address_coma_split_1 = address_coma_split[1]
     address_coma_split_1_space_split = address_coma_split_1.split(' ')
-    address_coma_split_1_space_split.remove('')
+    try:
+        address_coma_split_1_space_split.remove('')
+    except ValueError:
+        pass
 
-    if address_coma_split_1_space_split[0].isnumeric():
+    if address_coma_split_1_space_split[0].isnumeric()\
+        and len(address_coma_split_1_space_split[0]) == 5:
         address_dict['Plz'] =  address_coma_split_1_space_split[0]
         address_coma_split_1_space_split.remove(address_coma_split_1_space_split[0])
     else:
         address_dict['Plz'] = float('NaN')
 
     # Extract stadt
+    if len(address_coma_split_1_space_split) == 0:
+        address_dict['Stadt'] = float('NaN')
+
     for i in range(len(address_coma_split_1_space_split)):
         if i == 0:
             if address_coma_split_1_space_split[0].isnumeric() == False:
@@ -272,13 +297,13 @@ def parse_address(address):
         else:
             address_dict['Stadt'] = float('NaN')
 
-    if address_coma_split_1_space_split[0].isnumeric() == False:
-        try:
-            # Extract bezirk
-            address_dict['Bezirk'] = address_coma_split_1_space_split[0].replace('(', '').replace(')', '') 
-        except IndexError:
-            pass
-    else:
-        address_dict['Bezirk'] = float('NaN')
+    try:
+        if address_coma_split_1_space_split[0].isnumeric() == False:
+            address_dict['Bezirk'] = address_coma_split_1_space_split[0].replace('(', '').replace(')', '')
+        else:
+            address_dict['Bezirk'] = float('NaN') 
+    except IndexError:
+            address_dict['Bezirk'] = float('NaN')
+    
 
     return address_dict
