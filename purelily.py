@@ -2,11 +2,12 @@ from scraper_leads_firmenacb import scrape_firmenabc
 from scraper_leads_gelbeseiten import scrape_gelbesieten
 
 from scraper_url import add_url
+from scraper_managing_director import add_managing_director
 from qualify_leads import qualify_leads_fn
-from comp.get_user_input import get_leadsfile_ql, get_wordlist_ql, open_wordlist, open_excel, \
+from comp.get_user_input import get_leadsfile_ql, open_wordlist,\
                                 get_company_location, get_company_type, get_wordlist_locations
 from leads_cleaner import clean_leads
-from temp_filler import fill_temp 
+from temp_filler import fill_temp
 
 from tqdm import tqdm  # Progress bar / counter
 import pandas as pd # Library to store and export data formated as a table
@@ -17,6 +18,7 @@ def operation_caller():
         " What operation would you like to run?\
         \nTo scrape leads from GelbeSeiten type 'G' and return/enter\
         \nTo scrape from all of Gemany from GelbeSeiten type 'GG' and return/enter\
+        \nTo scrape managing directer from leads imprint type 'MD'and return/enter\
         \nTo scrape leads from firmenabc type 'F' and return/enter\
         \nTo scrape additional URLSs for and existing file type 'U' and return/enter\
         \nTo qualify leads from an existing file type 'Q' and return/enter\
@@ -38,6 +40,10 @@ def operation_caller():
     elif operator == 'GG' or operator == 'gg'\
         or operator == 'Gg' or operator == 'gG':
         gg_operation()
+
+    elif operator == 'MD' or operator == 'md'\
+        or operator == 'Md' or operator == 'mD':
+        md_operation()
 
     elif operator == 'F' or operator == 'f':
         scrape_firmenabc()
@@ -73,15 +79,12 @@ def g_operation():
     company_type = get_company_type()
     location = get_company_location()
     df = scrape_gelbesieten(company_type, location)
-    print(df)
-
     # Exporting table in excel format
     filename = company_type + "_" + location
     df.to_excel("leads/" + filename + ".xlsx")
 
 def gg_operation():
     company_type = get_company_type()
-    # Extract list of cities TODO
     locations_filename = get_wordlist_locations()
     location_list = open_wordlist(locations_filename)
     failed_location_list = []
@@ -101,6 +104,11 @@ def gg_operation():
     pd.set_option('display.max_rows', None)
     
     df.to_excel("wordlist/failed_locations.xlsx")
+
+def md_operation():
+    filename = 'Steuerberater_Ahaus'
+    add_managing_director(filename)
+    pass
 
 def full_operation():
     filename = scrape_firmenabc()
