@@ -4,15 +4,19 @@ from scraper_leads_gelbeseiten import scrape_gelbesieten
 from scraper_url import add_url
 from qualify_leads import qualify_leads_fn
 from comp.get_user_input import get_leadsfile_ql, get_wordlist_ql, open_wordlist, open_excel, \
-                                get_company_location, get_company_type
+                                get_company_location, get_company_type, get_wordlist_locations
 from leads_cleaner import clean_leads
 from temp_filler import fill_temp 
 
+from tqdm import tqdm  # Progress bar / counter
+import pandas as pd # Library to store and export data formated as a table
 
 def operation_caller():
     # Printing general usage information for final user.
-    print(" What operation would you like to run?\
+    print(
+        " What operation would you like to run?\
         \nTo scrape leads from GelbeSeiten type 'G' and return/enter\
+        \nTo scrape from all of Gemany from GelbeSeiten type 'GG' and return/enter\
         \nTo scrape leads from firmenabc type 'F' and return/enter\
         \nTo scrape additional URLSs for and existing file type 'U' and return/enter\
         \nTo qualify leads from an existing file type 'Q' and return/enter\
@@ -21,7 +25,8 @@ def operation_caller():
         \nTo extract the information for mails and templates type 'C' and return/enter\
         \nTo create outreach word files from the exel file 'W' and return/enter\
         \nTo extract to extract informations for mails and the word files type 'CW' and return/enter\
-        \nTo complete all tasks mentioned as one operation type 'X' and return/enter")
+        \nTo complete all tasks mentioned as one operation type 'X' and return/enter"
+    )
     operator = input("Operation: ")
 
     if operator == '':
@@ -30,10 +35,16 @@ def operation_caller():
     elif operator == 'G' or operator == 'g':
         g_operation()
 
+    elif operator == 'GG' or operator == 'gg'\
+        or operator == 'Gg' or operator == 'gG':
+        gg_operation()
+
     elif operator == 'F' or operator == 'f':
         scrape_firmenabc()
 
     elif operator == 'U' or operator == 'u':
+        # FIX ERROR RELATED TO MISSPLACEMENT OF DATA TODO
+        # FUCK YOU PATRICK!!
         filename = get_leadsfile_ql()
         add_url(filename)
         
@@ -59,7 +70,6 @@ def operation_caller():
         print("Invalid input, try running it again with the recomended inputs\n")
 
 def g_operation():
-    
     company_type = get_company_type()
     location = get_company_location()
     df = scrape_gelbesieten(company_type, location)
@@ -68,6 +78,29 @@ def g_operation():
     # Exporting table in excel format
     filename = company_type + "_" + location
     df.to_excel("leads/" + filename + ".xlsx")
+
+def gg_operation():
+    company_type = get_company_type()
+    # Extract list of cities TODO
+    locations_filename = get_wordlist_locations()
+    location_list = open_wordlist(locations_filename)
+    failed_location_list = []
+    for location in tqdm(location_list['Cities'], desc='German-list'):
+        df = scrape_gelbesieten(company_type, location)
+        if df.empty:
+            print('-->', location, 'failed')
+            failed_location_list.append(location)
+        else:
+            filename = company_type + "_" + location
+            df.to_excel("leads/germany/" + filename + ".xlsx")
+
+    failed_locations = {
+        'Failed Locations': failed_location_list,
+    }
+    df = pd.DataFrame(data=failed_locations)
+    pd.set_option('display.max_rows', None)
+    
+    df.to_excel("wordlist/failed_locations.xlsx")
 
 def full_operation():
     filename = scrape_firmenabc()
