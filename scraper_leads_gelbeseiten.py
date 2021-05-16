@@ -278,8 +278,7 @@ def parse_address(address):
         address_dict['Plz'] = float('NaN')
 
     # Extract stadt
-    if len(address_coma_split_1_space_split) == 0:
-        address_dict['Stadt'] = float('NaN')
+    stadt_dict = float('NaN')
 
     for i in range(len(address_coma_split_1_space_split)):
         if i == 0:
@@ -288,7 +287,7 @@ def parse_address(address):
                 address_coma_split_1_space_split.remove(address_coma_split_1_space_split[0])
         elif i != 0:
             if address_coma_split_1_space_split[0].isnumeric() == False \
-                and '(' not in address_coma_split_1_space_split[0]:
+            and '(' not in address_coma_split_1_space_split[0]:
                 stadt_dict += ' ' + address_coma_split_1_space_split[0]
                 address_coma_split_1_space_split.remove(address_coma_split_1_space_split[0])
 
