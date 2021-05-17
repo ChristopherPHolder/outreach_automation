@@ -133,6 +133,7 @@ dmypy.json
 
 # Internal results of scraper
 /leads
+/pending_post
 
 # Internal wordlist
 /wordlist
