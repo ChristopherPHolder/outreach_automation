@@ -27,6 +27,7 @@ def qualify_leads_fn(filename, wordlist):
     subdomains = wordlist[wordlist["State"] == "Subdomains"].Word.tolist()
 
     options = Options()
+    options.headless = True
     options.add_argument("--lang=en")
     driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=options)
 
