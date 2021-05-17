@@ -35,7 +35,10 @@ def scrape_firmenabc():
     # Code necesary for the limit 
     limit_set = 0
 
-    driver = webdriver.Chrome(ChromeDriverManager().install())
+    options = Options()
+    options.headless = True
+
+    driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
     driver.get("https://www.firmenabc.at/")
 
     # Wait for cookie popup to load
