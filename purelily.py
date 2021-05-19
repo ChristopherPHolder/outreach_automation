@@ -107,8 +107,8 @@ def gg_operation():
 
 def md_operation():
     filename = 'Steuerberater_Ahaus'
-    add_managing_director(filename)
-    pass
+    df = add_managing_director(filename)
+    df.to_excel('leads/' + filename + '_imprint.xlsx')
 
 def full_operation():
     filename = scrape_firmenabc()
