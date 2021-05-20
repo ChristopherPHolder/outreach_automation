@@ -3,6 +3,8 @@ import numpy as np
 
 from tqdm import tqdm
 
+import spacy as spacy
+
 from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
@@ -20,6 +22,8 @@ def add_managing_director(filename):
 
     df = check_add_imprint_manager_count_column(df)
     df = add_imprint_manager_count(df, driver)
+
+    df = add_manager_name(df, driver)
 
     driver.close()
     return df
@@ -84,7 +88,6 @@ def add_imprint_manager_count(df, driver):
                 imprint_url = df['Impressum'][i]
                 driver.get(imprint_url)
 
-                #print('Scraping -->', imprint_url)
                 elems = []
                 for title in manager_titles:
                     elem = driver.find_elements_by_xpath("//*[contains(text(),%s)]" % title)
@@ -99,6 +102,46 @@ def add_imprint_manager_count(df, driver):
 def get_list_of_manager_titles():
     df_titles = pd.read_excel("wordlist/manager_titles.xlsx")
     return [df_titles['Manager Title'][i] for i in df_titles.index]
+
+def extract_manager_name_from_imprint(driver, imprint_url):
+    driver.get(imprint_url)
+    titles = get_list_of_manager_titles()
+    nlp = spacy.load("de_core_news_md")
+    for title in titles:
+        elem = driver.find_elements_by_xpath("//*[contains(text(),%s)]" % title)
+        i_title = []
+        for i in range(len(elem)):
+            if title in elem[i].text:
+                i_title.append(i)
+        for i in range(len(i_title)):
+            doc = nlp(elem[i_title[-i -1]].text)
+            for entity in doc.ents:
+                if entity.label_ == 'PER':
+                    return entity.text
+    return np.nan
+
+def add_manager_name(df, driver):
+
+    """with tqdm(
+        total = df.loc[
+            (df['Geschäftsführer'].isnull() == True) & (df['Impressum Word Count'].isnull() == False)
+        ].count(),
+        desc = "Extracting names"
+    ) as pbar:"""
+
+    for i in df.index:
+        if pd.isnull(df['Geschäftsführer'][i]) == True\
+        and df['Impressum Word Count'][i] == 1\
+        and pd.isnull(df['Impressum'][i]) == False:
+
+            imprint_url = df['Impressum'][i]
+            name = extract_manager_name_from_imprint(driver, imprint_url)
+            df['Geschäftsführer'][i] = name
+
+            #pbar.update(1)
+
+    return df
+
 
 # def add manager names 
 # Iterate over each lead
