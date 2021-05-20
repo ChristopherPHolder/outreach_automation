@@ -106,9 +106,9 @@ def gg_operation():
     df.to_excel("wordlist/failed_locations.xlsx")
 
 def md_operation():
-    filename = 'Steuerberater_Ahaus'
+    filename = 'Steuerberater_Ahaus_test'
     df = add_managing_director(filename)
-    df.to_excel('leads/' + filename + '_imprint.xlsx')
+    df.to_excel('leads/' + filename + '.xlsx', index=False)
 
 def full_operation():
     filename = scrape_firmenabc()
