@@ -17,9 +17,13 @@ Then activate the shell
   
   $ pipenv shell
 
+Then download the nlp model
+
+  $ python -m spacy download de_core_news_md
+
 Them run the program
 
-  $ python3 purelily.py
+  $ python purelily.py
 
 Them provide the input which is prometed from the terminal. 
 
