@@ -42,6 +42,8 @@ docxtpl = "==0.11.3"
 python-docx = "==0.8.10"
 MarkupSafe = "==1.1.1"
 Jinja2 = "==2.11.3"
+nltk = "*"
+spacy = "*"
 
 [dev-packages]
 
