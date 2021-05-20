@@ -72,24 +72,28 @@ def add_imprint_manager_count(df, driver):
     manager_titles = get_list_of_manager_titles()
     with tqdm(
         total = df.loc[(df['Geschäftsführer'].isnull()) & (df['Impressum Word Count'].isnull()), 'Impressum'].count(),
-        desc='Scraping'
+        desc='Counting Titles'
     ) as pbar:
 
         for i in df.index:
             if  pd.isnull(df['Geschäftsführer'][i]) == True\
             and pd.isnull(df['Impressum'][i]) == False\
             and pd.isnull(df['Impressum Word Count'][i]) == True:
-                pbar.update(1)
-
-                imprint_url = df['Impressum'][i]
                 
+                pbar.update(1)
+                imprint_url = df['Impressum'][i]
                 driver.get(imprint_url)
+
+                #print('Scraping -->', imprint_url)
+                elems = []
                 for title in manager_titles:
-                    elems = driver.find_elements_by_xpath("//*[contains(text(),%s)]" % title)
-
-                    if len(elems) != 0:
-                        df['Impressum Word Count'][i] = len(elems)
-
+                    elem = driver.find_elements_by_xpath("//*[contains(text(),%s)]" % title)
+                    if title in elem[0].text:
+                        elems.append((elem[0].text).count(title))
+                
+                if len(elems) != 0:
+                    df['Impressum Word Count'][i] = sum(elems)
+                    
     return df
 
 def get_list_of_manager_titles():
