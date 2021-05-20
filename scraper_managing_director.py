@@ -19,7 +19,7 @@ def add_managing_director(filename):
     df = add_imprint(df, driver)
 
     df = check_add_imprint_manager_count_column(df)
-    df = add_imprint_manager_count(df, df_g, driver)
+    df = add_imprint_manager_count(df, driver)
 
     driver.close()
     return df
