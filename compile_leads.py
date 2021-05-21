@@ -8,6 +8,7 @@ def compile_leads():
     for filename in leads_filename_list:
         df_to_comp = get_leads_to_compile(filename)
         df_comp = insert_new_leads(df_comp, df_to_comp)
+        df_comp = df_comp.drop_duplicates()
     save_compiled_leads(df_comp)
     print(df_comp)
 
@@ -23,7 +24,7 @@ def save_compiled_leads(df_comp):
     for file in files:
         if file.endswith('.xlsx'):
             filename = file
-            df_comp.to_excel("leads/compile/compiled/%s" % filename)
+            df_comp.to_excel("leads/compile/compiled/%s" % filename, index=False)
 
 def get_list_leads_to_compile():
     files = os.listdir('leads/compile/to_compile/')
