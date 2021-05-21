@@ -257,7 +257,9 @@ def scrape_gelbesieten(company_type, location):
 def parse_address(address):
 
     address_dict = {}
-
+    # Remove doble comas
+    address.replace(',,', '')
+    
     # Extract strasse
     address_coma_split = address.split(',')
     address_dict['Strasse'] = address_coma_split[0]
@@ -269,7 +271,6 @@ def parse_address(address):
         address_coma_split_1_space_split.remove('')
     except ValueError:
         pass
-
     if address_coma_split_1_space_split[0].isnumeric()\
         and len(address_coma_split_1_space_split[0]) == 5:
         address_dict['Plz'] =  address_coma_split_1_space_split[0]
