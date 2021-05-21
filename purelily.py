@@ -6,8 +6,10 @@ from scraper_managing_director import add_managing_director
 from qualify_leads import qualify_leads_fn
 from comp.get_user_input import get_leadsfile_ql, open_wordlist,\
                                 get_company_location, get_company_type, get_wordlist_locations
+
 from leads_cleaner import clean_leads
 from temp_filler import fill_temp
+from compile_leads import compile_leads
 
 from tqdm import tqdm  # Progress bar / counter
 import pandas as pd # Library to store and export data formated as a table
@@ -19,6 +21,7 @@ def operation_caller():
         \nTo scrape leads from GelbeSeiten type 'G' and return/enter\
         \nTo scrape from all of Gemany from GelbeSeiten type 'GG' and return/enter\
         \nTo scrape managing directer from leads imprint type 'MD'and return/enter\
+        \nTo compile leads type 'COMP' and return/enter\
         \nTo scrape leads from firmenabc type 'F' and return/enter\
         \nTo scrape additional URLSs for and existing file type 'U' and return/enter\
         \nTo qualify leads from an existing file type 'Q' and return/enter\
@@ -44,6 +47,10 @@ def operation_caller():
     elif operator == 'MD' or operator == 'md'\
         or operator == 'Md' or operator == 'mD':
         md_operation()
+    
+    elif operator == 'COMP' or operator == 'comp'\
+        or operator == 'Comp':
+        comp_operation()
 
     elif operator == 'F' or operator == 'f':
         scrape_firmenabc()
@@ -109,6 +116,14 @@ def md_operation():
     filename = 'Steuerberater_Ahaus_test'
     df = add_managing_director(filename)
     df.to_excel('leads/' + filename + '.xlsx', index=False)
+
+def comp_operation():
+    print(
+        'Make sure all leads you want to add are located in ../leads/compile/to_compile/.\
+        \nand file you want to compile them to is the only file in ../leads/compile/compiled/.\
+        \nAlso it will fail to compile leads with diferent format!\
+        \nTo cancel the operation press cmd + c (Mac) or ctrl + c (Windows)')
+    compile_leads()
 
 def full_operation():
     filename = scrape_firmenabc()
