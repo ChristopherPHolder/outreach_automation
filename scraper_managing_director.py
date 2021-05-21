@@ -121,24 +121,24 @@ def extract_manager_name_from_imprint(driver, imprint_url):
     return np.nan
 
 def add_manager_name(df, driver):
-
-    """with tqdm(
+    with tqdm(
         total = df.loc[
-            (df['Geschäftsführer'].isnull() == True) & (df['Impressum Word Count'].isnull() == False)
+            (df['Geschäftsführer'].isnull() == True) & (df['Impressum Word Count'] == 1),
+            'Impressum'
         ].count(),
-        desc = "Extracting names"
-    ) as pbar:"""
+        desc="Extracting names"
+    ) as pbar:
+    
+        for i in df.index:
+            if pd.isnull(df['Geschäftsführer'][i]) == True\
+            and df['Impressum Word Count'][i] == 1\
+            and pd.isnull(df['Impressum'][i]) == False:
 
-    for i in df.index:
-        if pd.isnull(df['Geschäftsführer'][i]) == True\
-        and df['Impressum Word Count'][i] == 1\
-        and pd.isnull(df['Impressum'][i]) == False:
+                imprint_url = df['Impressum'][i]
+                name = extract_manager_name_from_imprint(driver, imprint_url)
+                df['Geschäftsführer'][i] = name
 
-            imprint_url = df['Impressum'][i]
-            name = extract_manager_name_from_imprint(driver, imprint_url)
-            df['Geschäftsführer'][i] = name
-
-            #pbar.update(1)
+                pbar.update(1)
 
     return df
 
