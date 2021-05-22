@@ -1,16 +1,16 @@
 import pandas as pd
 import numpy as np
 import os
+from tqdm import tqdm  # Progress bar / counter
 
 def compile_leads():
     df_comp = get_compiled_leads()
     leads_filename_list = get_list_leads_to_compile()
-    for filename in leads_filename_list:
+    for filename in tqdm(leads_filename_list, desc='Compiling'):
         df_to_comp = get_leads_to_compile(filename)
         df_comp = insert_new_leads(df_comp, df_to_comp)
         df_comp = df_comp.drop_duplicates()
     save_compiled_leads(df_comp)
-    print(df_comp)
 
 def get_compiled_leads():
     files = os.listdir('leads/compile/compiled/')
