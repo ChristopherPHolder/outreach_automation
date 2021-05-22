@@ -9,7 +9,9 @@ from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.common.exceptions import WebDriverException,\
-                                        StaleElementReferenceException
+                                        StaleElementReferenceException,\
+                                        UnexpectedAlertPresentException,\
+                                        TimeoutException
 
 def add_managing_director(filename):
     df = pd.read_excel("leads/" + filename + ".xlsx")
@@ -18,15 +20,22 @@ def add_managing_director(filename):
     options = Options()    
     driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
     driver.implicitly_wait(2.5)
+
     df = add_imprint(df, driver)
+    save_changes_to_file(df, filename)
 
     df = check_add_imprint_manager_count_column(df)
     df = add_imprint_manager_count(df, driver)
+    save_changes_to_file(df, filename)
 
     df = add_manager_name(df, driver)
+    save_changes_to_file(df, filename)
 
     driver.close()
     return df
+
+def save_changes_to_file(df, filename):
+    df.to_excel("leads/%s.xlsx" % filename, index=False)
 
 def add_imprint(df, driver):
     n = 0
@@ -43,7 +52,7 @@ def add_imprint(df, driver):
                 n += 1
                 web_url = df['Web'][i]
                 imprint_url = get_imprint_url(web_url, driver)
-                df['Impressum'][i] = imprint_url
+                df.loc[i, 'Impressum'] = imprint_url
                 
     return df
 
@@ -63,7 +72,7 @@ def get_imprint_url(web_url, driver):
         try:
             if 'impressum' in elem.get_attribute('href'):
                 return elem.get_attribute('href')
-        except StaleElementReferenceException:
+        except (StaleElementReferenceException, TypeError, UnexpectedAlertPresentException):
             pass
     return np.nan
 
@@ -83,20 +92,23 @@ def add_imprint_manager_count(df, driver):
             if  pd.isnull(df['Geschäftsführer'][i]) == True\
             and pd.isnull(df['Impressum'][i]) == False\
             and pd.isnull(df['Impressum Word Count'][i]) == True:
-                
-                pbar.update(1)
-                imprint_url = df['Impressum'][i]
-                driver.get(imprint_url)
-
-                elems = []
-                for title in manager_titles:
-                    elem = driver.find_elements_by_xpath("//*[contains(text(),%s)]" % title)
-                    if title in elem[0].text:
-                        elems.append((elem[0].text).count(title))
-                
-                if len(elems) != 0:
-                    df['Impressum Word Count'][i] = sum(elems)
+                try:                
+                    pbar.update(1)
+                    try:
+                        imprint_url = df['Impressum'][i]
+                        driver.get(imprint_url)
+                    except TimeoutException:
+                        continue
+                    elems = []
+                    for title in manager_titles:
+                        elem = driver.find_elements_by_xpath("//*[contains(text(),%s)]" % title)
+                        if title in elem[0].text:
+                            elems.append((elem[0].text).count(title))
                     
+                    if len(elems) != 0:
+                        df.loc[i, 'Impressum Word Count'] = sum(elems)
+                except UnexpectedAlertPresentException:
+                    pass          
     return df
 
 def get_list_of_manager_titles():
@@ -136,7 +148,7 @@ def add_manager_name(df, driver):
 
                 imprint_url = df['Impressum'][i]
                 name = extract_manager_name_from_imprint(driver, imprint_url)
-                df['Geschäftsführer'][i] = name
+                df.loc[i, 'Geschäftsführer'] = name
 
                 pbar.update(1)
 
