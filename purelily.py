@@ -5,7 +5,8 @@ from scraper_url import add_url
 from scraper_managing_director import add_managing_director
 from qualify_leads import qualify_leads_fn
 from comp.get_user_input import get_leadsfile_ql, open_wordlist,\
-                                get_company_location, get_company_type, get_wordlist_locations
+                                get_company_location, get_company_type,\
+                                get_wordlist_locations
 
 from leads_cleaner import clean_leads
 from temp_filler import fill_temp
@@ -108,7 +109,7 @@ def gg_operation():
             location_list.to_excel("wordlist/%s.xlsx" % locations_filename, index=False)
 
 def md_operation():
-    filename = 'Steuerberater_Ahaus_test'
+    filename = input("Insert leads: ")
     df = add_managing_director(filename)
     df.to_excel('leads/' + filename + '.xlsx', index=False)
 
