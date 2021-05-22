@@ -84,6 +84,6 @@ def add_url(filename):
     df_t.drop("URL", axis=1, inplace=True)
 
     filename = filename + "_plus"
-    df_t.to_excel("leads/" + filename + ".xlsx")
+    df_t.to_excel("leads/" + filename + ".xlsx", index=False)
 
     return filename
