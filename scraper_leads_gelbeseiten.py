@@ -103,7 +103,7 @@ def scrape_gelbesieten(company_type, location):
                 ).text
                 if current_list_size == initial_list_size:
                     if (time.perf_counter() - initial_time) > 30:
-                        print('Error: page took longer then 30 min \
+                        print('Error: page took longer then 30 sec \
                             to load next set of content')
                         return pd.DataFrame()
                 else:
