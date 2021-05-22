@@ -17,7 +17,8 @@ def add_managing_director(filename):
     df = pd.read_excel("leads/" + filename + ".xlsx")
 
     df = check_add_imprint_column(df)
-    options = Options()    
+    options = Options()
+    options.headless = True   
     driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
     driver.implicitly_wait(2.5)
 
