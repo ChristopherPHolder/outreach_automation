@@ -132,7 +132,6 @@ def scrape_gelbesieten(company_type, location):
     tel = []
     mail = []
     web = []
-    nan = float('NaN')
 
     #print('\nProcessing lead data.')
     
@@ -162,7 +161,7 @@ def scrape_gelbesieten(company_type, location):
         firmenname.append(companyname.text)
         #print('Company Name:', firmenname[l])
 
-        geschaftsfuhrer.append(nan)
+        geschaftsfuhrer.append(np.nan)
 
         try:
             address = driver.find_element_by_xpath(
@@ -174,28 +173,28 @@ def scrape_gelbesieten(company_type, location):
             try:
                 bezirk_ort_plz.append(address_dict['Bezirk'])
             except KeyError:
-                bezirk_ort_plz.append(nan)
+                bezirk_ort_plz.append(np.nan)
 
             try:
                 strasse.append(address_dict['Strasse'])
             except KeyError:
-                strasse.append(nan)
+                strasse.append(np.nan)
 
             try:
                 plz.append(address_dict['Plz'])
             except KeyError:
-                plz.append(nan)
+                plz.append(np.nan)
 
             try:
                 stadt.append(address_dict['Stadt'])
             except KeyError:
-                stadt.append(nan)
+                stadt.append(np.nan)
 
         except NoSuchElementException:
-            bezirk_ort_plz.append(nan)
-            strasse.append(nan)
-            plz.append(nan)
-            stadt.append(nan)
+            bezirk_ort_plz.append(np.nan)
+            strasse.append(np.nan)
+            plz.append(np.nan)
+            stadt.append(np.nan)
 
 
         try:
@@ -205,7 +204,7 @@ def scrape_gelbesieten(company_type, location):
                 ).text
             )
         except NoSuchElementException:
-            tel.append(nan)
+            tel.append(np.nan)
         #print('Phone:', tel[l])
 
         try:
@@ -215,12 +214,12 @@ def scrape_gelbesieten(company_type, location):
 
             mail_dot_split = mail_link.split('.')
             if 'gelbeseiten' in mail_dot_split:
-                mail.append(nan)
+                mail.append(np.nan)
             else: 
                 mail_link_re_split = re.split('\:|\?', mail_link)
                 mail.append(mail_link_re_split[1])
         except NoSuchElementException:
-            mail.append(nan)
+            mail.append(np.nan)
 
         #print('Email:', mail[l])
         try:
@@ -232,12 +231,12 @@ def scrape_gelbesieten(company_type, location):
             )
             url_dot_split = url.split('.')
             if 'gelbeseiten' in url_dot_split or '@' in url:
-                url = nan
+                url = np.nan
 
             web.append(url)
 
         except NoSuchElementException:
-            web.append(nan)
+            web.append(np.nan)
 
 
     # Creating DataFrame
@@ -281,10 +280,10 @@ def parse_address(address):
             address_dict['Plz'] =  address_coma_split_1_space_split[0]
             address_coma_split_1_space_split.remove(address_coma_split_1_space_split[0])
         else:
-            address_dict['Plz'] = float('NaN')
+            address_dict['Plz'] = np.nan
 
         # Extract stadt
-        stadt_dict = float('NaN')
+        stadt_dict = np.nan
 
         for i in range(len(address_coma_split_1_space_split)):
             if i == 0:
@@ -300,15 +299,15 @@ def parse_address(address):
                 address_dict['Stadt'] = stadt_dict
                 
             else:
-                address_dict['Stadt'] = float('NaN')
+                address_dict['Stadt'] = np.nan
 
         try:
             if address_coma_split_1_space_split[0].isnumeric() == False:
                 address_dict['Bezirk'] = address_coma_split_1_space_split[0].replace('(', '').replace(')', '')
             else:
-                address_dict['Bezirk'] = float('NaN') 
+                address_dict['Bezirk'] = np.nan 
         except IndexError:
-                address_dict['Bezirk'] = float('NaN')
+                address_dict['Bezirk'] = np.nan
     except IndexError:
         address_dict['Strasse'] = np.nan
         address_dict['Stadt'] = np.nan
