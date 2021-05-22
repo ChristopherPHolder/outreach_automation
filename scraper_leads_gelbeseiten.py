@@ -21,7 +21,6 @@ def scrape_gelbesieten(company_type, location):
     options = Options()
     options.headless = True
 
-    #print('Starting up scraper')
     driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
     driver.get("https://www.gelbeseiten.de/")
 
@@ -92,7 +91,7 @@ def scrape_gelbesieten(company_type, location):
     complete_list_size = driver.find_element_by_xpath(
         '//*[@id="loadMoreGesamtzahl"]'
     ).text
-    #print('Downloading data from:', complete_list_size, 'leads')
+
     with tqdm(
         total=int(complete_list_size), 
         initial=50, desc='Downloading') as pbar:
@@ -110,7 +109,7 @@ def scrape_gelbesieten(company_type, location):
                 else:
                     pbar.update(int(current_list_size) - int(initial_list_size))
                     initial_list_size = current_list_size
-                    #print(current_list_size,end='')
+
                 try:
                     button_mehr_anzeigen = driver.find_element_by_xpath(
                         '//*[@id="mod-LoadMore--button"]'
@@ -133,33 +132,19 @@ def scrape_gelbesieten(company_type, location):
     mail = []
     web = []
 
-    #print('\nProcessing lead data.')
     
     for i in tqdm(range(int(current_list_size)), desc='Processing '):
         lead = i + 1
         l = (len(firmenname) - 1)
-        #print("Lead #", (l+1) , '--', lead)
-
-        '''
-        move = ActionChains(driver)
-        move.move_to_element(
-            driver.find_element_by_xpath(
-                f'//*[@id="gs_treffer"]/div/article[{lead}]'
-            )
-        ).perform()
-        time.sleep(0.8)
-        '''
 
         try:
             companyname = driver.find_element_by_xpath(
                 f'//*[@id="gs_treffer"]/div/article[{lead}]/a/h2'
             )
         except:
-            #print('Error: downloading the lead does not follow the same format')
             continue
 
         firmenname.append(companyname.text)
-        #print('Company Name:', firmenname[l])
 
         geschaftsfuhrer.append(np.nan)
 
@@ -167,7 +152,7 @@ def scrape_gelbesieten(company_type, location):
             address = driver.find_element_by_xpath(
                 f'//*[@id="gs_treffer"]/div/article[{lead}]/a/address/p[1]'
             ).text
-            # print(address)
+
             address_dict = parse_address(address)
             
             try:
@@ -205,7 +190,6 @@ def scrape_gelbesieten(company_type, location):
             )
         except NoSuchElementException:
             tel.append(np.nan)
-        #print('Phone:', tel[l])
 
         try:
             mail_link = driver.find_element_by_xpath(
@@ -221,7 +205,6 @@ def scrape_gelbesieten(company_type, location):
         except NoSuchElementException:
             mail.append(np.nan)
 
-        #print('Email:', mail[l])
         try:
             # Check if it said gelbeseite is its site 
             url = (
