@@ -120,16 +120,20 @@ def extract_manager_name_from_imprint(driver, imprint_url):
     titles = get_list_of_manager_titles()
     nlp = spacy.load("de_core_news_md")
     for title in titles:
-        elem = driver.find_elements_by_xpath("//*[contains(text(),%s)]" % title)
-        i_title = []
-        for i in range(len(elem)):
-            if title in elem[i].text:
-                i_title.append(i)
-        for i in range(len(i_title)):
-            doc = nlp(elem[i_title[-i -1]].text)
-            for entity in doc.ents:
-                if entity.label_ == 'PER':
-                    return entity.text
+        try:
+            elem = driver.find_elements_by_xpath("//*[contains(text(),%s)]" % title)
+            i_title = []
+            for i in range(len(elem)):
+                if title in elem[i].text:
+                    i_title.append(i)
+            for i in range(len(i_title)):
+                doc = nlp(elem[i_title[-i -1]].text)
+                for entity in doc.ents:
+                    if entity.label_ == 'PER'\
+                    and 4 > len((entity.text).split()) > 1:
+                        return entity.text
+        except StaleElementReferenceException:
+            continue
     return np.nan
 
 def add_manager_name(df, driver):
