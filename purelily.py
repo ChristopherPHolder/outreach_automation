@@ -88,29 +88,24 @@ def g_operation():
     df = scrape_gelbesieten(company_type, location)
     # Exporting table in excel format
     filename = company_type + "_" + location
-    df.to_excel("leads/" + filename + ".xlsx")
+    df.to_excel("leads/" + filename + ".xlsx", index=False)
 
 def gg_operation():
     company_type = get_company_type()
     locations_filename = get_wordlist_locations()
     location_list = open_wordlist(locations_filename)
-    failed_location_list = []
     for location in tqdm(location_list['Cities'], desc='German-list'):
         df = scrape_gelbesieten(company_type, location)
         if df.empty:
             print('-->', location, 'failed')
-            failed_location_list.append(location)
+            df_failed_cities = pd.read_excel("wordlist/failed_locations.xlsx")
+            df_failed_cities = df_failed_cities.append({'Cities': location}, ignore_index=True)
+            df_failed_cities.to_excel("wordlist/failed_locations.xlsx", index=False)
         else:
             filename = company_type + "_" + location
-            df.to_excel("leads/germany/" + filename + ".xlsx")
-
-    failed_locations = {
-        'Failed Locations': failed_location_list,
-    }
-    df = pd.DataFrame(data=failed_locations)
-    pd.set_option('display.max_rows', None)
-    
-    df.to_excel("wordlist/failed_locations.xlsx")
+            df.to_excel("leads/germany/" + filename + ".xlsx", index=False)
+            location_list = location_list.drop(index=(location_list[location_list['Cities'] == location].index))
+            location_list.to_excel("wordlist/%s.xlsx" % locations_filename, index=False)
 
 def md_operation():
     filename = 'Steuerberater_Ahaus_test'
