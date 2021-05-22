@@ -14,6 +14,7 @@ import time  # Library to allow waiting and sleep
 import re # Library for resplting data
 import pandas as pd # Library to store and export data formated as a table
 from tqdm import tqdm  # Progress bar / counter
+import numpy as np # Numerical (np.nan)
 
 def scrape_gelbesieten(company_type, location):
 
@@ -97,25 +98,28 @@ def scrape_gelbesieten(company_type, location):
         initial=50, desc='Downloading') as pbar:
         downloading = True
         while downloading:
-            current_list_size = driver.find_element_by_xpath(
-                '//*[@id="loadMoreGezeigteAnzahl"]'
-            ).text
-            if current_list_size == initial_list_size:
-                if (time.perf_counter() - initial_time) > 30:
-                    print('Error: page took longer then 30 min \
-                        to load next set of content')
-                    return pd.DataFrame()
-            else:
-                pbar.update(int(current_list_size) - int(initial_list_size))
-                initial_list_size = current_list_size
-                #print(current_list_size,end='')
             try:
-                button_mehr_anzeigen = driver.find_element_by_xpath(
-                    '//*[@id="mod-LoadMore--button"]'
-                )
-                button_mehr_anzeigen.click()
-                time.sleep(0.5)
-            except ElementNotInteractableException:
+                current_list_size = driver.find_element_by_xpath(
+                    '//*[@id="loadMoreGezeigteAnzahl"]'
+                ).text
+                if current_list_size == initial_list_size:
+                    if (time.perf_counter() - initial_time) > 30:
+                        print('Error: page took longer then 30 min \
+                            to load next set of content')
+                        return pd.DataFrame()
+                else:
+                    pbar.update(int(current_list_size) - int(initial_list_size))
+                    initial_list_size = current_list_size
+                    #print(current_list_size,end='')
+                try:
+                    button_mehr_anzeigen = driver.find_element_by_xpath(
+                        '//*[@id="mod-LoadMore--button"]'
+                    )
+                    button_mehr_anzeigen.click()
+                    time.sleep(0.5)
+                except ElementNotInteractableException:
+                    break
+            except NoSuchElementException:
                 break
 
     # Initializing list
@@ -257,53 +261,58 @@ def scrape_gelbesieten(company_type, location):
 def parse_address(address):
 
     address_dict = {}
-    # Remove doble comas
-    address.replace(',,', '')
-    
-    # Extract strasse
-    address_coma_split = address.split(',')
-    address_dict['Strasse'] = address_coma_split[0]
+    try: 
+        # Remove doble comas
+        address.replace(',,', ',')
+        
+        # Extract strasse
+        address_coma_split = address.split(',')
+        address_dict['Strasse'] = address_coma_split[0]
 
-    # Extract plz
-    address_coma_split_1 = address_coma_split[1]
-    address_coma_split_1_space_split = address_coma_split_1.split(' ')
-    try:
-        address_coma_split_1_space_split.remove('')
-    except ValueError:
-        pass
-    if address_coma_split_1_space_split[0].isnumeric()\
-        and len(address_coma_split_1_space_split[0]) == 5:
-        address_dict['Plz'] =  address_coma_split_1_space_split[0]
-        address_coma_split_1_space_split.remove(address_coma_split_1_space_split[0])
-    else:
-        address_dict['Plz'] = float('NaN')
+        # Extract plz
+        address_coma_split_1 = address_coma_split[1]
+        address_coma_split_1_space_split = address_coma_split_1.split(' ')
+        try:
+            address_coma_split_1_space_split.remove('')
+        except ValueError:
+            pass
+        if address_coma_split_1_space_split[0].isnumeric()\
+            and len(address_coma_split_1_space_split[0]) == 5:
+            address_dict['Plz'] =  address_coma_split_1_space_split[0]
+            address_coma_split_1_space_split.remove(address_coma_split_1_space_split[0])
+        else:
+            address_dict['Plz'] = float('NaN')
 
-    # Extract stadt
-    stadt_dict = float('NaN')
+        # Extract stadt
+        stadt_dict = float('NaN')
 
-    for i in range(len(address_coma_split_1_space_split)):
-        if i == 0:
+        for i in range(len(address_coma_split_1_space_split)):
+            if i == 0:
+                if address_coma_split_1_space_split[0].isnumeric() == False:
+                    stadt_dict = address_coma_split_1_space_split[0]
+                    address_coma_split_1_space_split.remove(address_coma_split_1_space_split[0])
+            elif i != 0:
+                if address_coma_split_1_space_split[0].isnumeric() == False \
+                and '(' not in address_coma_split_1_space_split[0]:
+                    stadt_dict += ' ' + address_coma_split_1_space_split[0]
+                    address_coma_split_1_space_split.remove(address_coma_split_1_space_split[0])
+
+                address_dict['Stadt'] = stadt_dict
+                
+            else:
+                address_dict['Stadt'] = float('NaN')
+
+        try:
             if address_coma_split_1_space_split[0].isnumeric() == False:
-                stadt_dict = address_coma_split_1_space_split[0]
-                address_coma_split_1_space_split.remove(address_coma_split_1_space_split[0])
-        elif i != 0:
-            if address_coma_split_1_space_split[0].isnumeric() == False \
-            and '(' not in address_coma_split_1_space_split[0]:
-                stadt_dict += ' ' + address_coma_split_1_space_split[0]
-                address_coma_split_1_space_split.remove(address_coma_split_1_space_split[0])
-
-            address_dict['Stadt'] = stadt_dict
-            
-        else:
-            address_dict['Stadt'] = float('NaN')
-
-    try:
-        if address_coma_split_1_space_split[0].isnumeric() == False:
-            address_dict['Bezirk'] = address_coma_split_1_space_split[0].replace('(', '').replace(')', '')
-        else:
-            address_dict['Bezirk'] = float('NaN') 
+                address_dict['Bezirk'] = address_coma_split_1_space_split[0].replace('(', '').replace(')', '')
+            else:
+                address_dict['Bezirk'] = float('NaN') 
+        except IndexError:
+                address_dict['Bezirk'] = float('NaN')
     except IndexError:
-            address_dict['Bezirk'] = float('NaN')
-    
-
+        address_dict['Strasse'] = np.nan
+        address_dict['Stadt'] = np.nan
+        address_dict['Bezirk'] = np.nan
+        address_dict['Plz'] = np.nan
+        
     return address_dict
