@@ -158,19 +158,3 @@ def add_manager_name(df, driver):
                 pbar.update(1)
 
     return df
-
-
-# def add manager names 
-# Iterate over each lead
-    # If lead does not have managing director
-    # AND has imprint
-        # Open imprint
-        # If 'managing director' (list of words) in imprint
-        # def try to parse data to extract names ':)
-        # Add name to 'Maybe managing director'
-
-# save file
-# close file
-
-# Def get imprint
-# Def get mananger name
