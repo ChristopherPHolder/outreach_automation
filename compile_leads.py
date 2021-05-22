@@ -52,9 +52,3 @@ def insert_new_columns(df_comp, df_to_comp):
 
 def insert_new_leads_info(df_comp, df_to_comp):
     return df_comp.append(df_to_comp)
-
-# Check that compiled leads has all headers
-    # Add header if necessary
-
-# Add leads to the file
-    # Save the file
