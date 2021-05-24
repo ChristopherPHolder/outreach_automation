@@ -237,7 +237,7 @@ def scrape_firmenabc():
     
     # Exporting table in excel format
     filename = companytype + "_" + location
-    df.to_excel("leads/" + filename + ".xlsx")
+    df.to_excel("leads/" + filename + ".xlsx", index=False)
 
     driver.close()
 
