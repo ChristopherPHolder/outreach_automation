@@ -8,7 +8,7 @@ from comp.get_user_input import get_leadsfile_ql, open_wordlist,\
                                 get_company_location, get_company_type,\
                                 get_wordlist_locations
 
-from leads_cleaner import clean_leads
+from cleaners.leads_cleaner import clean_leads
 from cleaners.name_cleaner import clean_names_in_file
 from temp_filler import fill_temp
 from compile_leads import compile_leads
