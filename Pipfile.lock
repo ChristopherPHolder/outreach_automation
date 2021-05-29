@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "d0267891505a21393254d62e86d88cd9ec6bca845553d0537af671eccb064066"
+            "sha256": "d97a1b65f36a743d58123fc5af2268c56d8395ec944e0d8c4a7ab7b880e90b24"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -153,6 +153,14 @@
             ],
             "index": "pypi",
             "version": "==1.0.1"
+        },
+        "gender-guesser": {
+            "hashes": [
+                "sha256:1591c14592805ca7da06a46d5f7202511f7cb87547049a68dfccbeedb879f31b",
+                "sha256:7cb01ce5d8d43b94573498bc02c959b622872abd399622ca67d1b73ba6e7e222"
+            ],
+            "index": "pypi",
+            "version": "==0.4.0"
         },
         "idna": {
             "hashes": [
