@@ -9,6 +9,7 @@ from comp.get_user_input import get_leadsfile_ql, open_wordlist,\
                                 get_wordlist_locations
 
 from leads_cleaner import clean_leads
+from cleaners.name_cleaner import clean_names_in_file
 from temp_filler import fill_temp
 from compile_leads import compile_leads
 
@@ -52,6 +53,9 @@ def operation_caller():
     elif operator == 'COMP' or operator == 'comp'\
         or operator == 'Comp':
         comp_operation()
+    
+    elif operator == 'CN' or operator == 'cn':
+        cn_operation()
 
     elif operator == 'F' or operator == 'f':
         scrape_firmenabc()
@@ -120,6 +124,10 @@ def comp_operation():
         \nAlso it will fail to compile leads with diferent format!\
         \nTo cancel the operation press cmd + c (Mac) or ctrl + c (Windows)')
     compile_leads()
+
+def cn_operation():
+    filename = input("Insert leads: ")
+    clean_names_in_file(filename)
 
 def full_operation():
     filename = scrape_firmenabc()
