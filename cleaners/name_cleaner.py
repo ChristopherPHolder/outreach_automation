@@ -6,7 +6,6 @@ import re
 def clean_names_in_file(filename):
     df = pd.read_excel("leads/%s.xlsx" % filename)
     df = clean_df_names(df)
-    filename += '_cleaned_names'
     df.to_excel("leads/%s.xlsx" % filename, index=False)
 
 def clean_df_names(df):
