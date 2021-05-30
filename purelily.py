@@ -159,7 +159,13 @@ def c_operation():
 
 def w_operation():
     filename = get_leadsfile_ql()
-    fill_temp(filename)
+    name_order = input(
+        "Specify name order\
+        \ntlf = Title Last-name First-name\
+        \ntfl = Title First-name Last-name\
+        \nInsert Order: "
+    )
+    fill_temp(filename, name_order)
 
 def cw_operation():
     filename = c_operation()
