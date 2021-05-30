@@ -137,3 +137,6 @@ dmypy.json
 
 # Internal wordlist
 /wordlist
+
+# Internal templates
+/word_templates
