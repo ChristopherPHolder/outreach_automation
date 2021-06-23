@@ -136,7 +136,7 @@ dmypy.json
 /pending_post
 
 # Internal wordlist
-/wordlist
+#/wordlist
 
 # Internal templates
 /word_templates
