@@ -15,12 +15,12 @@ def scrape_firmenabc():
     limit_set = 0
 
     options = Options()
-    options.headless = False
+    options.headless = True
 
     driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
     driver.get("https://www.firmenabc.at/")
 
-    # Wait for cookie popup to load
+    print(companytype)
     while True:
         try:
             # Accept cookie popup
@@ -221,3 +221,5 @@ def scrape_firmenabc():
     driver.close()
 
     return filename
+
+scrape_firmenabc()
