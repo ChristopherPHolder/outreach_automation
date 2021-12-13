@@ -25,7 +25,7 @@ def scrape_gelbesieten(company_type, location):
     )
 
     options = Options()
-    options.headless = False
+    options.headless = True
 
     driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
     driver.get(search_url)
