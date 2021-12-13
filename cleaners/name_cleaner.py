@@ -91,8 +91,11 @@ def remove_double_space_in_name(name):
     return name
     
 def remove_start_and_end_spaces_in_name(name):
-    name = remove_start_spaces_in_name(name)
-    name = remove_end_spaces_in_name(name)
+    try:
+        name = remove_start_spaces_in_name(name)
+        name = remove_end_spaces_in_name(name)
+    except IndexError:
+        pass
     return name
 
 def remove_start_spaces_in_name(name):
