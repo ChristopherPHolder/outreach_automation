@@ -18,11 +18,17 @@ import numpy as np # Numerical (np.nan)
 
 def scrape_gelbesieten(company_type, location):
 
+    search_url = (
+        'https://www.gelbeseiten.de/Suche/%s/%s' % (
+            company_type, location
+        )
+    )
+
     options = Options()
-    options.headless = True
+    options.headless = False
 
     driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
-    driver.get("https://www.gelbeseiten.de/")
+    driver.get(search_url)
 
     # Wait for cookie popup to load
     while True:
@@ -35,7 +41,7 @@ def scrape_gelbesieten(company_type, location):
             break
         except: 
             time.sleep(1)
-
+    """
     # Fill in search inputs
     search_input_was = driver.find_element_by_xpath(
         '//*[@id="what_search"]'
@@ -84,14 +90,20 @@ def scrape_gelbesieten(company_type, location):
         initial_time = time.perf_counter()
     except NoSuchElementException:
         return pd.DataFrame()
-
+    
     for i in tqdm(range(300), desc='Pre-loading'):
         time.sleep(0.05) # Allows banner add to move out the way
+    """
+
+    initial_time = time.perf_counter()
 
     complete_list_size = driver.find_element_by_xpath(
-        '//*[@id="loadMoreGesamtzahl"]'
+        '//*[@id="mod-TrefferlisteInfo"]'
     ).text
 
+    current_list_size = complete_list_size
+    initial_list_size = 50
+    
     with tqdm(
         total=int(complete_list_size), 
         initial=50, desc='Downloading') as pbar:
@@ -105,20 +117,23 @@ def scrape_gelbesieten(company_type, location):
                     if (time.perf_counter() - initial_time) > 30:
                         print('Error: page took longer then 30 sec \
                             to load next set of content')
-                        return pd.DataFrame()
+                        pass
+                        #return pd.DataFrame()
                 else:
                     pbar.update(int(current_list_size) - int(initial_list_size))
                     initial_list_size = current_list_size
 
                 try:
+                    time.sleep(0.5)
                     button_mehr_anzeigen = driver.find_element_by_xpath(
                         '//*[@id="mod-LoadMore--button"]'
                     )
                     button_mehr_anzeigen.click()
                     time.sleep(0.5)
-                except ElementNotInteractableException:
-                    break
-            except NoSuchElementException:
+                except ElementNotInteractableException as e:
+                    print(e)
+            except NoSuchElementException as e:
+                print(e)
                 break
 
     # Initializing list
@@ -131,7 +146,6 @@ def scrape_gelbesieten(company_type, location):
     tel = []
     mail = []
     web = []
-
     
     for i in tqdm(range(int(current_list_size)), desc='Processing '):
         lead = i + 1
